@@ -325,7 +325,7 @@ GameObject:
   - component: {fileID: 672116611}
   - component: {fileID: 672116610}
   - component: {fileID: 672116609}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -579,7 +579,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0.3572905, y: -0.012633217, z: 0.004755981, w: 0.9338958}
-  m_LocalPosition: {x: 0.20197682, y: 4.8246436, z: -7.443678}
+  m_LocalPosition: {x: 0.20197682, y: 4.734644, z: -7.443678}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -679,7 +679,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1126539045}
   m_LocalRotation: {x: 0.3572905, y: -0.012633217, z: 0.004755981, w: 0.9338958}
-  m_LocalPosition: {x: 0.20197682, y: 4.8246436, z: -7.443678}
+  m_LocalPosition: {x: 0.20197682, y: 4.734644, z: -7.443678}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2064503595}
@@ -834,7 +834,7 @@ GameObject:
   - component: {fileID: 1740567652}
   - component: {fileID: 1740567651}
   - component: {fileID: 1740567650}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Ground (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1148,7 +1148,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7558310379913836279, guid: 613899251f164b6499c5e6376f954225, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.85
+      value: 0.68
       objectReference: {fileID: 0}
     - target: {fileID: 7558310379913836279, guid: 613899251f164b6499c5e6376f954225, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1182,5 +1182,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 7558310380315716778, guid: 613899251f164b6499c5e6376f954225, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.67
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 1697656213, guid: 613899251f164b6499c5e6376f954225, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 613899251f164b6499c5e6376f954225, type: 3}
