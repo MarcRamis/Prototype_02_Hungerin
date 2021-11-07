@@ -40,32 +40,31 @@ public class Hungerin : MonoBehaviour
 
     private void NormalMovement()
     {
-        float horizontal = Input.GetAxis("Horizontal") * speed;
-        float vertical = Input.GetAxis("Vertical") * speed;
-        float jumpY = 0f;
+        // Inputs movement
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
-
+        
+        // Rotation direction
         float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
         float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
         transform.rotation = Quaternion.Euler(0f, angle, 0f);
         
         isGrounded = Physics.CheckSphere(m_Grounded.position, groundRadius, groundMask);
-        Debug.Log(isGrounded);
-
+        
         if (isGrounded)
         {
             if (Input.GetButton("Jump"))
             {
                 m_RigidBody.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
             }
+            m_RigidBody.velocity = new Vector3(horizontal, 0f, vertical) * speed * Time.deltaTime;
         }
         else
         {
             Vector3 gravity = globalGravity * gravityScale * Vector3.up;
             m_RigidBody.AddForce(gravity, ForceMode.Acceleration);
         }
-
-        m_RigidBody.velocity = new Vector3(horizontal, jumpY, vertical) * Time.deltaTime;
     }
 
     private void OnDrawGizmos()

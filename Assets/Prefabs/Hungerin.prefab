@@ -304,7 +304,7 @@ MonoBehaviour:
   m_RigidBody: {fileID: 7558310380315716758}
   m_CharacterController: {fileID: 0}
   speed: 300
-  jumpSpeed: 150
+  jumpSpeed: 30
   m_Grounded: {fileID: 7558310380250868357}
   groundRadius: 0.5
   groundMask:
