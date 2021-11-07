@@ -5,22 +5,14 @@ using UnityEngine;
 public class Objects : MonoBehaviour
 {
     [SerializeField] private EssencialProperties m_essencialProperties;
-    [SerializeField] private GameObject obj;
+    private Rigidbody m_Rigidbody;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        m_Rigidbody = gameObject.GetComponent<Rigidbody>();
+        m_Rigidbody.mass = m_essencialProperties.weight;
     }
 
     public float GetMass() { return m_essencialProperties.weight; }
-
     public float GetLargeSize() { return m_essencialProperties.largeSize; }
-
 }
