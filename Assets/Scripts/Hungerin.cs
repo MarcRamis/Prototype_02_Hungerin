@@ -4,13 +4,15 @@ using UnityEngine;
 
 public class Hungerin : MonoBehaviour
 {
-    EssencialProperties m_EssencialProperties;
     [SerializeField] private Rigidbody m_RigidBody;
-    [SerializeField] private CharacterController m_CharacterController;
-    
+
+    [Space]
+    [SerializeField] EssencialProperties m_EssencialProperties;
+
     [Space]
     [SerializeField] private float speed = 300f;
-    [SerializeField] private float jumpSpeed = 100f;
+    [SerializeField] private float jumpSpeed = 30f;
+    [SerializeField] private float jumpForwardSpeed = 3f;
     [Space]
     [SerializeField] private Transform m_Grounded;
     private bool isGrounded;
@@ -41,24 +43,30 @@ public class Hungerin : MonoBehaviour
     private void NormalMovement()
     {
         // Inputs movement
+
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
+
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
         
-        // Rotation direction
-        float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-        transform.rotation = Quaternion.Euler(0f, angle, 0f);
-        
+        // Rotation on forward direction
+        if (direction.magnitude >= 0.1f)
+        {
+            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+        }
+
         isGrounded = Physics.CheckSphere(m_Grounded.position, groundRadius, groundMask);
         
         if (isGrounded)
         {
             if (Input.GetButton("Jump"))
             {
-                m_RigidBody.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
+                m_RigidBody.AddForce(new Vector3(direction.x * jumpForwardSpeed, jumpSpeed, direction.z * jumpForwardSpeed), ForceMode.Impulse);
             }
-            m_RigidBody.velocity = new Vector3(horizontal, 0f, vertical) * speed * Time.deltaTime;
+
+            m_RigidBody.velocity = new Vector3(horizontal, 0f, vertical) * speed * Time.fixedDeltaTime;
         }
         else
         {

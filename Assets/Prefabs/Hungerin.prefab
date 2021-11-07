@@ -302,9 +302,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_RigidBody: {fileID: 7558310380315716758}
-  m_CharacterController: {fileID: 0}
+  m_EssencialProperties:
+    largeSize: 0
+    weight: 0
   speed: 300
   jumpSpeed: 30
+  jumpForwardSpeed: 6
   m_Grounded: {fileID: 7558310380250868357}
   groundRadius: 0.5
   groundMask:
