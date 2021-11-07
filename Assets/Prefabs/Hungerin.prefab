@@ -411,7 +411,7 @@ MonoBehaviour:
   m_Target: {fileID: 1395994417}
   m_LineRenderer: {fileID: 511783492}
   m_EssencialProperties:
-    largeSize: 0
+    largeSize: 1
     weight: 1
   speed: 300
   jumpSpeed: 30
@@ -425,6 +425,9 @@ MonoBehaviour:
   gravityScale: 20
   globalGravity: -9.81
   maxTongueDistance: 10
+  maxSize: 2.5
+  minSize: 0.5
+  launchDirectionAgainstMass: 100
 --- !u!120 &511783492
 LineRenderer:
   m_ObjectHideFlags: 0

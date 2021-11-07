@@ -98,7 +98,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_essencialProperties:
-    largeSize: 0
+    largeSize: 10
     weight: 10
 --- !u!54 &1112061121
 Rigidbody:

@@ -27,8 +27,13 @@ public class Hungerin : MonoBehaviour
     [SerializeField] private float gravityScale = 40.0f;
     [SerializeField] private float globalGravity = -9.81f;
     [Space]
+    private bool eatInputButton = false;
     [SerializeField] private float maxTongueDistance = 10.0f;
-
+    private float scalarMultiplier = 0.01f;
+    private Vector3 initialScale = new Vector3(1f,1f,1f);
+    [SerializeField] [Range(0.5f, 3.5f)] private float maxSize = 2.5f;
+    [SerializeField] [Range(0.5f, 3.5f)] private float minSize = 0.5f;
+    [SerializeField] private float launchDirectionAgainstMass = 10f;
 
     private void Awake()
     {
@@ -43,6 +48,10 @@ public class Hungerin : MonoBehaviour
     // Here we control the player
     private void Update()
     {
+        if (Input.GetButtonDown("LaunchTongue"))
+        {
+            eatInputButton = true;
+        }
     }
 
     // Here we make physics
@@ -88,7 +97,7 @@ public class Hungerin : MonoBehaviour
 
     private void UseTongue()
     {
-        if (Input.GetButton("LaunchTongue"))
+        if (eatInputButton)
         {
             Vector3 direction = m_Target.position - transform.position;
             Ray raycastTarget = new Ray(transform.position, direction.normalized);
@@ -99,9 +108,78 @@ public class Hungerin : MonoBehaviour
                 m_LineRenderer.enabled = true;
                 m_LineRenderer.SetPosition(0, transform.position);
                 m_LineRenderer.SetPosition(1, hit.point);
+
+                if (hit.collider.tag == "CanBeEaten")
+                {
+                    if(m_EssencialProperties.largeSize >= hit.collider.gameObject.GetComponent<Objects>().GetLargeSize())
+                    {
+                        hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
+                        
+                        SumSize(hit.collider.gameObject.GetComponent<Objects>().GetLargeSize());
+                        ScalarSize(hit.collider.gameObject.GetComponent<Objects>().GetLargeSize());
+                        SumWeight(hit.collider.gameObject.GetComponent<Objects>().GetWeight());
+                        SetNewMass(m_EssencialProperties.weight);
+                    }
+                    else
+                    {
+                        //LaunchToDirection(hit.collider.gameObject.transform.position);
+                    }
+                }
+                eatInputButton = false;
                 StartCoroutine("DisableTongue");
             }
         }
+    }
+
+    private void ScalarSize(float _largeSize)
+    {
+        if (transform.localScale.x >= minSize && transform.localScale.x <= maxSize)
+        {
+            transform.localScale +=
+            new Vector3(
+                _largeSize * scalarMultiplier,
+                _largeSize * scalarMultiplier,
+                _largeSize * scalarMultiplier);
+
+            if (transform.localScale.x >= maxSize)
+            {
+                transform.localScale =
+                    new Vector3(
+                        maxSize,
+                        maxSize,
+                        maxSize);
+            }
+            if (transform.localScale.x <= minSize)
+            {
+                transform.localScale =
+                    new Vector3(
+                        minSize,
+                        minSize,
+                        minSize);
+            }
+        }
+    }
+
+    private void SumSize(float sizeEaten)
+    {
+        m_EssencialProperties.largeSize += sizeEaten;
+    }
+    private void SumWeight(float weightEaten)
+    {
+        m_EssencialProperties.weight += weightEaten;
+    }
+
+    private void SetNewMass(float weightEaten)
+    {
+        m_RigidBody.mass = weightEaten;
+    }
+
+    private void LaunchToDirection(Vector3 target)
+    {
+        Vector3 direction = target - transform.position;
+        direction = direction.normalized;
+        
+        m_RigidBody.AddForce(direction * launchDirectionAgainstMass, ForceMode.Impulse);
     }
 
     IEnumerator DisableTongue()
@@ -109,7 +187,7 @@ public class Hungerin : MonoBehaviour
         yield return new WaitForSeconds(1f);
         m_LineRenderer.enabled = false;
     }
-
+    
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;

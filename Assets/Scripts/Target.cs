@@ -5,7 +5,7 @@ using UnityEngine;
 public class Target : MonoBehaviour
 {
     private RaycastHit hit;
-    
+
     // Update is called once per frame
     void FixedUpdate()
     {

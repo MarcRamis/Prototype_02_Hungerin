@@ -97,7 +97,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_essencialProperties:
-    largeSize: 0
+    largeSize: 1
     weight: 1
 --- !u!65 &6531501949776013148
 BoxCollider:
