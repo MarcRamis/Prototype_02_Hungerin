@@ -2,17 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Ability : MonoBehaviour
+public abstract class Ability
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    protected Rigidbody _rb { get; set; }
+    public string textName { get; set; }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public abstract void Movement(float speed);
 }
