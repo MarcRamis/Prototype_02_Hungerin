@@ -26,14 +26,17 @@ public class Hungerin : MonoBehaviour
     [Space]
     [SerializeField] private float gravityScale = 40.0f;
     [SerializeField] private float globalGravity = -9.81f;
+
     [Space]
-    private bool eatInputButton = false;
+    [Header("Tongue physics")]
     [SerializeField] private float maxTongueDistance = 10.0f;
-    private float scalarMultiplier = 0.01f;
-    private Vector3 initialScale = new Vector3(1f,1f,1f);
     [SerializeField] [Range(0.5f, 3.5f)] private float maxSize = 2.5f;
     [SerializeField] [Range(0.5f, 3.5f)] private float minSize = 0.5f;
     [SerializeField] private float launchDirectionAgainstMass = 10f;
+    private bool eatInputButton = false;
+    private float scalarMultiplier = 0.01f;
+    private Vector3 initialScale = new Vector3(1f,1f,1f);
+    private bool playerIsForced = false;
 
     private void Awake()
     {
@@ -65,8 +68,8 @@ public class Hungerin : MonoBehaviour
     {
         // Inputs movement
 
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        float vertical = Input.GetAxisRaw("Vertical");
 
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
         Vector3 directionRotation = m_Target.position - transform.position;
@@ -86,7 +89,10 @@ public class Hungerin : MonoBehaviour
                 m_RigidBody.AddForce(new Vector3(direction.x * jumpForwardSpeed, jumpSpeed, direction.z * jumpForwardSpeed), ForceMode.Impulse);
             }
 
-            m_RigidBody.velocity = new Vector3(horizontal, 0f, vertical) * speed * Time.fixedDeltaTime;
+            if (!playerIsForced)
+            {
+                m_RigidBody.velocity = direction * speed * Time.fixedDeltaTime;
+            }
         }
         else
         {
@@ -122,7 +128,9 @@ public class Hungerin : MonoBehaviour
                     }
                     else
                     {
-                        //LaunchToDirection(hit.collider.gameObject.transform.position);
+                        playerIsForced = true;
+                        LaunchToDirection(hit.collider.gameObject.transform.position);
+                        StartCoroutine("PlayerIsForced");
                     }
                 }
                 eatInputButton = false;
@@ -179,13 +187,18 @@ public class Hungerin : MonoBehaviour
         Vector3 direction = target - transform.position;
         direction = direction.normalized;
         
-        m_RigidBody.AddForce(direction * launchDirectionAgainstMass, ForceMode.Impulse);
+        m_RigidBody.AddForce(direction * launchDirectionAgainstMass, ForceMode.Acceleration);
     }
 
     IEnumerator DisableTongue()
     {
         yield return new WaitForSeconds(1f);
         m_LineRenderer.enabled = false;
+    }    
+    IEnumerator PlayerIsForced()
+    {
+        yield return new WaitForSeconds(0.15f);
+        playerIsForced = false;
     }
     
     private void OnDrawGizmos()

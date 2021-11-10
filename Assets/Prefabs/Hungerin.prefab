@@ -427,7 +427,7 @@ MonoBehaviour:
   maxTongueDistance: 10
   maxSize: 2.5
   minSize: 0.5
-  launchDirectionAgainstMass: 100
+  launchDirectionAgainstMass: 2000
 --- !u!120 &511783492
 LineRenderer:
   m_ObjectHideFlags: 0
