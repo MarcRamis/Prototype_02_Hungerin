@@ -12,31 +12,51 @@ public class Hungerin : MonoBehaviour
     [SerializeField] EssencialProperties m_EssencialProperties;
 
     [Space]
+    [Header("Movement physics")]
     [SerializeField] private float speed = 300f;
+    
+    [Space]
+    [Header("Jump physics")]
     [SerializeField] private float jumpSpeed = 30f;
     [SerializeField] private float jumpForwardSpeed = 3f;
+    
     [Space]
+    [Header("Ground physics")]
     [SerializeField] private Transform m_Grounded;
     private bool isGrounded;
     [SerializeField] private float groundRadius = 0.5f;
     [SerializeField] private LayerMask groundMask;
+    
     [Space]
+    [Header("Rotation physics")]
     [SerializeField] private float turnSmoothTime = 0.1f;
     private float turnSmoothVelocity;
+    
     [Space]
+    [Header("Gravity physics")]
     [SerializeField] private float gravityScale = 40.0f;
     [SerializeField] private float globalGravity = -9.81f;
 
     [Space]
-    [Header("Tongue physics")]
+    [Header("Eat physics")]
     [SerializeField] private float maxTongueDistance = 10.0f;
     [SerializeField] [Range(0.5f, 3.5f)] private float maxSize = 2.5f;
     [SerializeField] [Range(0.5f, 3.5f)] private float minSize = 0.5f;
-    [SerializeField] private float launchDirectionAgainstMass = 10f;
+    [SerializeField] private float launchDirectionAgainstMassForce = 2000f;
+    [SerializeField] private float launchUpDirectionAgainstMassForce = 1000f;
     private bool eatInputButton = false;
     private float scalarMultiplier = 0.01f;
     private Vector3 initialScale = new Vector3(1f,1f,1f);
     private bool playerIsForced = false;
+
+    [Space]
+    [Header("Spit physics")]
+    [SerializeField] Transform m_SpitSpawn;
+    [SerializeField] GameObject bulletPrefab;
+    [SerializeField] private float bulletSpeed = 20f;
+    //[SerializeField] private LayerMask[] eatenObjectsMask;
+    private bool spitInputButton = false;
+    //private GameObject[] eatenObjects = null;
 
     private void Awake()
     {
@@ -55,6 +75,10 @@ public class Hungerin : MonoBehaviour
         {
             eatInputButton = true;
         }
+        if (Input.GetButtonDown("Spit"))
+        {
+            spitInputButton = true;
+        }
     }
 
     // Here we make physics
@@ -62,6 +86,7 @@ public class Hungerin : MonoBehaviour
     {
         NormalMovement();
         UseTongue();
+        UseSpit();
     }
 
     private void NormalMovement()
@@ -111,18 +136,17 @@ public class Hungerin : MonoBehaviour
 
             if (Physics.Raycast(raycastTarget, out hit, maxTongueDistance))
             {
-                m_LineRenderer.enabled = true;
-                m_LineRenderer.SetPosition(0, transform.position);
-                m_LineRenderer.SetPosition(1, hit.point);
+                DrawLineRenderer(hit.point);
 
                 if (hit.collider.tag == "CanBeEaten")
                 {
+                    // If player is bigger than this gameobject
                     if(m_EssencialProperties.largeSize >= hit.collider.gameObject.GetComponent<Objects>().GetLargeSize())
                     {
                         hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
                         
                         SumSize(hit.collider.gameObject.GetComponent<Objects>().GetLargeSize());
-                        ScalarSize(hit.collider.gameObject.GetComponent<Objects>().GetLargeSize());
+                        MaxScalarSize(hit.collider.gameObject.GetComponent<Objects>().GetLargeSize());
                         SumWeight(hit.collider.gameObject.GetComponent<Objects>().GetWeight());
                         SetNewMass(m_EssencialProperties.weight);
                     }
@@ -134,14 +158,36 @@ public class Hungerin : MonoBehaviour
                     }
                 }
                 eatInputButton = false;
-                StartCoroutine("DisableTongue");
             }
         }
     }
-
-    private void ScalarSize(float _largeSize)
+    private void UseSpit()
     {
-        if (transform.localScale.x >= minSize && transform.localScale.x <= maxSize)
+        if (spitInputButton)
+        {
+            if(transform.localScale.x >= minSize)
+            {
+                // Spit
+                GameObject bullet = Instantiate(bulletPrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
+                Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+
+                // Spit force
+                Vector3 direction = m_Target.position - m_SpitSpawn.position;
+                bulletRb.AddForce(direction.normalized * bulletSpeed, ForceMode.Impulse);
+
+                SumSize(-2f);
+                MinScalarSize(-2f);
+                SumWeight(-2f);
+                SetNewMass(m_EssencialProperties.weight);
+            }
+
+            spitInputButton = false;
+        }
+    }
+
+    private void MaxScalarSize(float _largeSize)
+    {
+        if (transform.localScale.x <= maxSize)
         {
             transform.localScale +=
             new Vector3(
@@ -157,6 +203,18 @@ public class Hungerin : MonoBehaviour
                         maxSize,
                         maxSize);
             }
+        }
+    }
+    private void MinScalarSize(float _largeSize)
+    {
+        if (transform.localScale.x >= minSize)
+        {
+            transform.localScale +=
+            new Vector3(
+                _largeSize * scalarMultiplier,
+                _largeSize * scalarMultiplier,
+                _largeSize * scalarMultiplier);
+
             if (transform.localScale.x <= minSize)
             {
                 transform.localScale =
@@ -168,6 +226,7 @@ public class Hungerin : MonoBehaviour
         }
     }
 
+
     private void SumSize(float sizeEaten)
     {
         m_EssencialProperties.largeSize += sizeEaten;
@@ -176,7 +235,6 @@ public class Hungerin : MonoBehaviour
     {
         m_EssencialProperties.weight += weightEaten;
     }
-
     private void SetNewMass(float weightEaten)
     {
         m_RigidBody.mass = weightEaten;
@@ -187,7 +245,16 @@ public class Hungerin : MonoBehaviour
         Vector3 direction = target - transform.position;
         direction = direction.normalized;
         
-        m_RigidBody.AddForce(direction * launchDirectionAgainstMass, ForceMode.Acceleration);
+        m_RigidBody.AddForce(direction * launchDirectionAgainstMassForce + Vector3.up * launchUpDirectionAgainstMassForce, ForceMode.Acceleration);
+    }
+
+    private void DrawLineRenderer(Vector3 point)
+    {
+        m_LineRenderer.enabled = true;
+        m_LineRenderer.SetPosition(0, transform.position);
+        m_LineRenderer.SetPosition(1, point);
+
+        StartCoroutine("DisableTongue");
     }
 
     IEnumerator DisableTongue()
