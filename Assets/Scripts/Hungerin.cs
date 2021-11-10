@@ -7,6 +7,7 @@ public class Hungerin : MonoBehaviour
     [SerializeField] private Rigidbody m_RigidBody;
     [SerializeField] private Transform m_Target;
     [SerializeField] LineRenderer m_LineRenderer;
+    private Stack<EssencialProperties> eatenGameObjects = new Stack<EssencialProperties>();
 
     [Space]
     [SerializeField] EssencialProperties m_EssencialProperties;
@@ -44,10 +45,13 @@ public class Hungerin : MonoBehaviour
     [SerializeField] [Range(0.5f, 3.5f)] private float minSize = 0.5f;
     [SerializeField] private float launchDirectionAgainstMassForce = 2000f;
     [SerializeField] private float launchUpDirectionAgainstMassForce = 1000f;
+    [SerializeField] private float minWeight = 1.0f;
+    [SerializeField] private float minLargeSize = 0.0f;
     private bool eatInputButton = false;
     private float scalarMultiplier = 0.01f;
     private Vector3 initialScale = new Vector3(1f,1f,1f);
     private bool playerIsForced = false;
+    
 
     [Space]
     [Header("Spit physics")]
@@ -137,17 +141,23 @@ public class Hungerin : MonoBehaviour
             if (Physics.Raycast(raycastTarget, out hit, maxTongueDistance))
             {
                 DrawLineRenderer(hit.point);
-
                 if (hit.collider.tag == "CanBeEaten")
                 {
                     // If player is bigger than this gameobject
                     if(m_EssencialProperties.largeSize >= hit.collider.gameObject.GetComponent<Objects>().GetLargeSize())
                     {
+                        //He stores the object eaten
+                        EssencialProperties tempProperties;
+                        tempProperties.largeSize = hit.transform.gameObject.GetComponent<Objects>().GetSumSize();
+                        tempProperties.weight = hit.transform.gameObject.GetComponent<Objects>().GetSumWeight();
+                        eatenGameObjects.Push(tempProperties);
+                        //
+
                         hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
                         
-                        SumSize(hit.collider.gameObject.GetComponent<Objects>().GetLargeSize());
-                        MaxScalarSize(hit.collider.gameObject.GetComponent<Objects>().GetLargeSize());
-                        SumWeight(hit.collider.gameObject.GetComponent<Objects>().GetWeight());
+                        SumSize(hit.collider.gameObject.GetComponent<Objects>().GetSumSize());
+                        MaxScalarSize(hit.collider.gameObject.GetComponent<Objects>().GetSumSize());
+                        SumWeight(hit.collider.gameObject.GetComponent<Objects>().GetSumWeight());
                         SetNewMass(m_EssencialProperties.weight);
                     }
                     else
@@ -156,17 +166,18 @@ public class Hungerin : MonoBehaviour
                         LaunchToDirection(hit.collider.gameObject.transform.position);
                         StartCoroutine("PlayerIsForced");
                     }
-                }
-                eatInputButton = false;
+                }               
             }
+            eatInputButton = false;
         }
     }
     private void UseSpit()
     {
         if (spitInputButton)
         {
-            if(transform.localScale.x >= minSize)
+            if(transform.localScale.x > minSize)
             {
+                
                 // Spit
                 GameObject bullet = Instantiate(bulletPrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
                 Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
@@ -175,10 +186,27 @@ public class Hungerin : MonoBehaviour
                 Vector3 direction = m_Target.position - m_SpitSpawn.position;
                 bulletRb.AddForce(direction.normalized * bulletSpeed, ForceMode.Impulse);
 
-                SumSize(-2f);
-                MinScalarSize(-2f);
-                SumWeight(-2f);
-                SetNewMass(m_EssencialProperties.weight);
+                //Eliminate stored object from the stack and store the values
+                EssencialProperties objToSpit;
+                if (eatenGameObjects.Count == 0)
+                {
+                    SumSize(-2.0f);
+                    MinScalarSize(-1.0f);
+                    SumWeight(-1.0f);
+                    SetNewMass(m_EssencialProperties.weight);
+                    
+                }
+                else
+                {
+                    objToSpit = eatenGameObjects.Peek();
+                    eatenGameObjects.Pop();
+                    SumSize(-objToSpit.largeSize);
+                    MinScalarSize(-objToSpit.largeSize);
+                    SumWeight(-objToSpit.weight);
+                    SetNewMass(m_EssencialProperties.weight);
+                }
+
+                
             }
 
             spitInputButton = false;
@@ -229,11 +257,26 @@ public class Hungerin : MonoBehaviour
 
     private void SumSize(float sizeEaten)
     {
-        m_EssencialProperties.largeSize += sizeEaten;
+        if (m_EssencialProperties.largeSize >= minLargeSize)
+        {
+            m_EssencialProperties.largeSize += sizeEaten;
+            if (m_EssencialProperties.largeSize < minLargeSize)
+            {
+                m_EssencialProperties.largeSize = minLargeSize;
+            }
+        }
     }
     private void SumWeight(float weightEaten)
     {
-        m_EssencialProperties.weight += weightEaten;
+        if(m_EssencialProperties.weight >= minWeight)
+        {
+            m_EssencialProperties.weight += weightEaten;
+            if (m_EssencialProperties.weight < minWeight)
+            {
+                m_EssencialProperties.weight = minWeight;
+            }
+        }
+        
     }
     private void SetNewMass(float weightEaten)
     {

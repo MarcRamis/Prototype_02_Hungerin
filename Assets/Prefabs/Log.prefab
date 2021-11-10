@@ -100,6 +100,7 @@ MonoBehaviour:
   m_essencialProperties:
     largeSize: 10
     weight: 10
+  typeObj: 1
 --- !u!54 &1112061121
 Rigidbody:
   m_ObjectHideFlags: 0
