@@ -4,18 +4,16 @@ using UnityEngine;
 
 public class Target : MonoBehaviour
 {
-    private Vector3 mouseDir;
     private RaycastHit hit;
-    
+
     // Update is called once per frame
     void FixedUpdate()
     {
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        if (Physics.Raycast(ray, out hit) /*&& hit.collider.tag == "Ground"*/)
+        if (Physics.Raycast(ray, out hit))
         {
-            transform.position = hit.point + new Vector3(0.0f,0.15f,0.0f);
-            Debug.Log(hit.point + new Vector3(0.0f, 0.15f, 0.0f));
+            transform.position = hit.point + new Vector3(0.0f,0.01f,0.0f);
         }
     }
 }
