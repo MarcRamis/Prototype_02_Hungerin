@@ -302,7 +302,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7558310380250868358}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.847, z: 0}
+  m_LocalPosition: {x: 0, y: -0.979, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7558310380315716778}
@@ -425,7 +425,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!114 &1507763486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -441,6 +441,7 @@ MonoBehaviour:
   m_RigidBody: {fileID: 7558310380315716758}
   m_Target: {fileID: 1395994417}
   m_LineRenderer: {fileID: 511783492}
+  m_Material: {fileID: 2100000, guid: fbc024332b8d4664b983627e791e8a9a, type: 2}
   m_EssencialProperties:
     largeSize: 1
     weight: 1
@@ -448,21 +449,26 @@ MonoBehaviour:
   jumpSpeed: 30
   jumpForwardSpeed: 6
   m_Grounded: {fileID: 7558310380250868357}
-  groundRadius: 0.3
+  groundRadius: 0.1
   groundMask:
-    serializedVersion: 2
+  - serializedVersion: 2
     m_Bits: 64
   turnSmoothTime: 0.1
   gravityScale: 20
   globalGravity: -9.81
+  gravityCollapseScale: 0
   maxTongueDistance: 10
   maxSize: 2.5
   minSize: 0.5
   launchDirectionAgainstMassForce: 2000
   launchUpDirectionAgainstMassForce: 1000
+  minWeight: 1
+  minLargeSize: 0
   m_SpitSpawn: {fileID: 1857337520}
   bulletPrefab: {fileID: 1928512621476752723, guid: b0d49576a4e47e040a06ccae2a016676, type: 3}
-  bulletSpeed: 20
+  bulletSpeed: 30
+  m_TypeTransformation: 0
+  collapseAttackRadius: 3
 --- !u!120 &511783492
 LineRenderer:
   m_ObjectHideFlags: 0

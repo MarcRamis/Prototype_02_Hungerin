@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class Hungerin : MonoBehaviour
 {
+    private enum TypeTransformation { NORMAL, COLLAPSE }
+
     [SerializeField] private Rigidbody m_RigidBody;
     [SerializeField] private Transform m_Target;
     [SerializeField] LineRenderer m_LineRenderer;
     private Stack<EssencialProperties> eatenGameObjects = new Stack<EssencialProperties>();
+    [SerializeField] private Material m_Material;
 
     [Space]
     [SerializeField] EssencialProperties m_EssencialProperties;
@@ -20,13 +23,14 @@ public class Hungerin : MonoBehaviour
     [Header("Jump physics")]
     [SerializeField] private float jumpSpeed = 30f;
     [SerializeField] private float jumpForwardSpeed = 3f;
+    private bool spaceInputButton = false;
     
     [Space]
     [Header("Ground physics")]
     [SerializeField] private Transform m_Grounded;
     private bool isGrounded;
     [SerializeField] private float groundRadius = 0.5f;
-    [SerializeField] private LayerMask groundMask;
+    [SerializeField] private LayerMask[] groundMask;
     
     [Space]
     [Header("Rotation physics")]
@@ -35,8 +39,9 @@ public class Hungerin : MonoBehaviour
     
     [Space]
     [Header("Gravity physics")]
-    [SerializeField] private float gravityScale = 40.0f;
+    [SerializeField] private float gravityScale = 20.0f;
     [SerializeField] private float globalGravity = -9.81f;
+    [SerializeField] private float gravityCollapseScale = 0f;
 
     [Space]
     [Header("Eat physics")]
@@ -51,17 +56,20 @@ public class Hungerin : MonoBehaviour
     private float scalarMultiplier = 0.01f;
     private Vector3 initialScale = new Vector3(1f,1f,1f);
     private bool playerIsForced = false;
-    
 
     [Space]
     [Header("Spit physics")]
     [SerializeField] Transform m_SpitSpawn;
     [SerializeField] GameObject bulletPrefab;
     [SerializeField] private float bulletSpeed = 20f;
-    //[SerializeField] private LayerMask[] eatenObjectsMask;
     private bool spitInputButton = false;
-    //private GameObject[] eatenObjects = null;
 
+    [Space]
+    [Header("Collapse Transformation physics")]
+    [SerializeField] private TypeTransformation m_TypeTransformation = TypeTransformation.NORMAL;
+    [SerializeField] private float collapseAttackRadius = 10f;
+    private bool canDoubleJump = false;
+    
     private void Awake()
     {
         m_RigidBody.mass = m_EssencialProperties.weight;
@@ -70,6 +78,7 @@ public class Hungerin : MonoBehaviour
     private void Start()
     {
         m_LineRenderer.enabled = false;
+        ChangeFormTransformation();
     }
 
     // Here we control the player
@@ -83,12 +92,35 @@ public class Hungerin : MonoBehaviour
         {
             spitInputButton = true;
         }
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            ChangeFormTransformation();
+        }
+        if(Input.GetButtonDown("Jump"))
+        {
+            spaceInputButton = true;
+        }
+        
+        Debug.Log("Can double jump: " + canDoubleJump);
     }
 
     // Here we make physics
     private void FixedUpdate()
     {
-        NormalMovement();
+        switch(m_TypeTransformation)
+        {
+            case TypeTransformation.NORMAL:
+                NormalMovement();
+                break;
+            case TypeTransformation.COLLAPSE:
+                CollapseMovement();
+                break;
+            default:
+                Debug.Log("Error type transformation");
+                break;
+        }
+
+        
         UseTongue();
         UseSpit();
     }
@@ -96,7 +128,6 @@ public class Hungerin : MonoBehaviour
     private void NormalMovement()
     {
         // Inputs movement
-
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
@@ -109,7 +140,11 @@ public class Hungerin : MonoBehaviour
         float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
         transform.rotation = Quaternion.Euler(0f, angle, 0f);
 
-        isGrounded = Physics.CheckSphere(m_Grounded.position, groundRadius, groundMask);
+        foreach (LayerMask layer in groundMask)
+        {
+            isGrounded = Physics.CheckSphere(m_Grounded.position, groundRadius, layer);
+            if (isGrounded) break;
+        }
         
         if (isGrounded)
         {
@@ -129,7 +164,6 @@ public class Hungerin : MonoBehaviour
             m_RigidBody.AddForce(gravity, ForceMode.Acceleration);
         }
     }
-
     private void UseTongue()
     {
         if (eatInputButton)
@@ -212,7 +246,65 @@ public class Hungerin : MonoBehaviour
             spitInputButton = false;
         }
     }
+    private void CollapseMovement()
+    {
+        // Inputs movement
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        float vertical = Input.GetAxisRaw("Vertical");
 
+        Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
+        Vector3 directionRotation = m_Target.position - transform.position;
+        directionRotation = directionRotation.normalized;
+
+        // Rotation on forward direction
+        float targetAngle = Mathf.Atan2(directionRotation.x, directionRotation.z) * Mathf.Rad2Deg;
+        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+        transform.rotation = Quaternion.Euler(0f, angle, 0f);
+
+        foreach (LayerMask layer in groundMask)
+        {
+            isGrounded = Physics.CheckSphere(m_Grounded.position, groundRadius, layer);
+            if (isGrounded) break;
+        }
+
+        if (isGrounded)
+        {
+            canDoubleJump = true;
+            if (spaceInputButton)
+            {
+                m_RigidBody.AddForce(new Vector3(direction.x * jumpForwardSpeed, jumpSpeed, direction.z * jumpForwardSpeed), ForceMode.Impulse);
+                spaceInputButton = false;
+            }
+
+            if (!playerIsForced)
+            {
+                m_RigidBody.velocity = direction * speed * Time.fixedDeltaTime;
+            }
+        }
+
+        else
+        {
+            if (canDoubleJump)
+            {
+                if (spaceInputButton)
+                {
+                    m_RigidBody.AddForce(new Vector3(direction.x * jumpForwardSpeed, jumpSpeed, direction.z * jumpForwardSpeed), ForceMode.Impulse);
+                    //Vector3 gravity = globalGravity * (gravityScale + gravityCollapseScale) * Vector3.up;
+                    //m_RigidBody.AddForce(gravity, ForceMode.Acceleration);
+                    spaceInputButton = false;
+                    canDoubleJump = false;
+                }
+            }
+
+            else
+            {
+                Vector3 gravity = globalGravity * gravityScale * Vector3.up;
+                m_RigidBody.AddForce(gravity, ForceMode.Acceleration);
+
+                canDoubleJump = false;
+            }
+        }
+    }
     private void MaxScalarSize(float _largeSize)
     {
         if (transform.localScale.x <= maxSize)
@@ -253,8 +345,6 @@ public class Hungerin : MonoBehaviour
             }
         }
     }
-
-
     private void SumSize(float sizeEaten)
     {
         if (m_EssencialProperties.largeSize >= minLargeSize)
@@ -300,6 +390,28 @@ public class Hungerin : MonoBehaviour
         StartCoroutine("DisableTongue");
     }
 
+    private void ChangeFormTransformation()
+    {
+        switch (m_TypeTransformation)
+        {
+            case TypeTransformation.NORMAL:
+                m_Material.color = NewColor(47,39,183,255);
+                gravityScale = 20;
+                break;
+            case TypeTransformation.COLLAPSE:
+                m_Material.color = NewColor(183, 39, 177, 255);
+                gravityScale = 10;
+                break;
+            default:
+                Debug.Log("Error type transformation");
+                break;
+        }
+    }
+
+    private Color NewColor(float r, float g, float b, float a)
+    {
+        return new Color(r/255, g/255, b/255, a/255);
+    }
     IEnumerator DisableTongue()
     {
         yield return new WaitForSeconds(1f);
@@ -317,5 +429,8 @@ public class Hungerin : MonoBehaviour
         Gizmos.DrawSphere(m_Grounded.transform.position, groundRadius);
 
         Gizmos.DrawLine(transform.position, m_Target.position);
+        
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(transform.position, collapseAttackRadius);
     }
 }
