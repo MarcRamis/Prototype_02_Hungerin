@@ -100,6 +100,7 @@ MonoBehaviour:
   m_essencialProperties:
     largeSize: 100
     weight: 100
+  typeObj: 2
 --- !u!65 &808883831
 BoxCollider:
   m_ObjectHideFlags: 0
