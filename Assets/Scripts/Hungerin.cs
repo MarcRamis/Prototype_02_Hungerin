@@ -311,6 +311,8 @@ public class Hungerin : MonoBehaviour
         playerIsForced = false;
     }
     
+    public float GetWeight() { return m_EssencialProperties.weight; }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
