@@ -36,7 +36,8 @@ public class Hungerin : MonoBehaviour
     [Header("Rotation physics")]
     [SerializeField] private float turnSmoothTime = 0.1f;
     private float turnSmoothVelocity;
-    
+    private float turnSmoothVelocity2;
+
     [Space]
     [Header("Gravity physics")]
     [SerializeField] private float gravityScale = 20.0f;
@@ -269,10 +270,10 @@ public class Hungerin : MonoBehaviour
 
         if (isGrounded)
         {
-            canDoubleJump = true;
             if (spaceInputButton)
             {
                 m_RigidBody.AddForce(new Vector3(direction.x * jumpForwardSpeed, jumpSpeed, direction.z * jumpForwardSpeed), ForceMode.Impulse);
+                canDoubleJump = true;
                 spaceInputButton = false;
             }
 
@@ -281,28 +282,31 @@ public class Hungerin : MonoBehaviour
                 m_RigidBody.velocity = direction * speed * Time.fixedDeltaTime;
             }
         }
-
         else
         {
             if (canDoubleJump)
             {
-                if (spaceInputButton)
+                if(spaceInputButton)
                 {
-                    m_RigidBody.AddForce(new Vector3(direction.x * jumpForwardSpeed, jumpSpeed, direction.z * jumpForwardSpeed), ForceMode.Impulse);
-                    //Vector3 gravity = globalGravity * (gravityScale + gravityCollapseScale) * Vector3.up;
-                    //m_RigidBody.AddForce(gravity, ForceMode.Acceleration);
-                    spaceInputButton = false;
+                    Vector3 gravity = globalGravity * gravityScale * gravityCollapseScale * Vector3.up;
+                    m_RigidBody.AddForce(gravity, ForceMode.Acceleration);
                     canDoubleJump = false;
+                    spaceInputButton = false;
                 }
+                else
+                {
+                    Vector3 gravity = globalGravity * gravityScale * Vector3.up;
+                    m_RigidBody.AddForce(gravity, ForceMode.Acceleration);
+                }
+                StartCoroutine("DisableDoubleJump");
             }
-
             else
             {
                 Vector3 gravity = globalGravity * gravityScale * Vector3.up;
                 m_RigidBody.AddForce(gravity, ForceMode.Acceleration);
-
-                canDoubleJump = false;
             }
+
+            spaceInputButton = false;   // This is because if you press space input button again in air it makes another jump without pressing at that moment
         }
     }
     private void MaxScalarSize(float _largeSize)
@@ -422,7 +426,11 @@ public class Hungerin : MonoBehaviour
         yield return new WaitForSeconds(0.15f);
         playerIsForced = false;
     }
-    
+    IEnumerator DisableDoubleJump()
+    {
+        yield return new WaitForSeconds(2f);
+        canDoubleJump = false;
+    }
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;

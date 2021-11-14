@@ -237,11 +237,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c74f83576d9104c4899898a9df72427a, type: 3}
---- !u!23 &59761824 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 7558310380315716756, guid: 613899251f164b6499c5e6376f954225, type: 3}
-  m_PrefabInstance: {fileID: 7558310379378641291}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &111729560
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2678,14 +2673,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1507763486, guid: 613899251f164b6499c5e6376f954225, type: 3}
-      propertyPath: m_MeshRenderer
-      value: 
-      objectReference: {fileID: 59761824}
-    - target: {fileID: 1507763486, guid: 613899251f164b6499c5e6376f954225, type: 3}
-      propertyPath: gravityCollapseScale
-      value: 20
-      objectReference: {fileID: 0}
     - target: {fileID: 7558310379913836272, guid: 613899251f164b6499c5e6376f954225, type: 3}
       propertyPath: m_Name
       value: Hungerin

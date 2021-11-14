@@ -456,7 +456,7 @@ MonoBehaviour:
   turnSmoothTime: 0.1
   gravityScale: 20
   globalGravity: -9.81
-  gravityCollapseScale: 0
+  gravityCollapseScale: 20
   maxTongueDistance: 10
   maxSize: 2.5
   minSize: 0.5
