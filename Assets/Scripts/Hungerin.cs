@@ -74,6 +74,7 @@ public class Hungerin : MonoBehaviour
     private void Awake()
     {
         m_RigidBody.mass = m_EssencialProperties.weight;
+        initialScale = transform.localScale;
     }
 
     private void Start()
@@ -101,8 +102,6 @@ public class Hungerin : MonoBehaviour
         {
             spaceInputButton = true;
         }
-        
-        Debug.Log("Can double jump: " + canDoubleJump);
     }
 
     // Here we make physics
@@ -120,8 +119,7 @@ public class Hungerin : MonoBehaviour
                 Debug.Log("Error type transformation");
                 break;
         }
-
-        
+ 
         UseTongue();
         UseSpit();
     }
@@ -430,6 +428,11 @@ public class Hungerin : MonoBehaviour
     {
         yield return new WaitForSeconds(2f);
         canDoubleJump = false;
+    }
+    public bool isInsideCollapseRadius(Vector3 target)
+    {
+        float distanceAToB = Vector3.Distance(transform.position, target);
+        return distanceAToB <= collapseAttackRadius;
     }
     private void OnDrawGizmos()
     {
