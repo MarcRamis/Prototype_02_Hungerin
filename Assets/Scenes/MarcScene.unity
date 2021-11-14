@@ -3160,6 +3160,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1507763486, guid: 613899251f164b6499c5e6376f954225, type: 3}
+      propertyPath: m_TypeTransformation
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7558310379913836272, guid: 613899251f164b6499c5e6376f954225, type: 3}
       propertyPath: m_Name
       value: Hungerin
