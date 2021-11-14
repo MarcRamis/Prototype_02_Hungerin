@@ -70,6 +70,7 @@ public class Hungerin : MonoBehaviour
     [SerializeField] private TypeTransformation m_TypeTransformation = TypeTransformation.NORMAL;
     [SerializeField] private float collapseAttackRadius = 10f;
     private bool canDoubleJump = false;
+    public bool isCollapsing { get; set; }
     
     private void Awake()
     {
@@ -279,6 +280,8 @@ public class Hungerin : MonoBehaviour
             {
                 m_RigidBody.velocity = direction * speed * Time.fixedDeltaTime;
             }
+
+            isCollapsing = false;
         }
         else
         {
@@ -290,6 +293,10 @@ public class Hungerin : MonoBehaviour
                     m_RigidBody.AddForce(gravity, ForceMode.Acceleration);
                     canDoubleJump = false;
                     spaceInputButton = false;
+                    isCollapsing = true;
+                    // IF SPHERE COLLIDING WITH BROKEN BOX
+
+                    // IF = BUT ENEMIES
                 }
                 else
                 {
@@ -428,6 +435,7 @@ public class Hungerin : MonoBehaviour
     {
         yield return new WaitForSeconds(2f);
         canDoubleJump = false;
+        isCollapsing = false;
     }
     public bool isInsideCollapseRadius(Vector3 target)
     {
