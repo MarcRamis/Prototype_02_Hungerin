@@ -47,8 +47,8 @@ public class Hungerin : MonoBehaviour
     [Space]
     [Header("Eat physics")]
     [SerializeField] private float maxTongueDistance = 10.0f;
-    [SerializeField] [Range(0.5f, 3.5f)] private float maxSize = 2.5f;
-    [SerializeField] [Range(0.5f, 3.5f)] private float minSize = 0.5f;
+    [SerializeField] [Range(0.3f, 3.5f)] private float maxSize = 2.5f;
+    [SerializeField] [Range(0.3f, 3.5f)] private float minSize = 0.5f;
     [SerializeField] private float launchDirectionAgainstMassForce = 2000f;
     [SerializeField] private float launchUpDirectionAgainstMassForce = 1000f;
     [SerializeField] private float minWeight = 1.0f;
@@ -448,6 +448,9 @@ public class Hungerin : MonoBehaviour
         isCollapsing = false;
     }
 
+
+    
+    public float GetWeight() { return m_EssencialProperties.weight; }
 
     private void OnDrawGizmos()
     {
