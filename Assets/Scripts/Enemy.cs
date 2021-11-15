@@ -14,7 +14,9 @@ public class Enemy : MonoBehaviour
     [Header("Movement physics")]
     [SerializeField] private float detectionRadius = 10f;
     [SerializeField] private float fleeRadius = 3f;
-    [SerializeField] private float speed = 200f;    
+    [SerializeField] private float speed = 200f;
+    public bool isForcedToSeek { get; set; }
+    private bool isForcedSeeking = false;
 
     [Space]
     [Header("Rotation physics")]
@@ -45,6 +47,13 @@ public class Enemy : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if(health <= 0) { Destroy(gameObject); }
+
+        StandardMove();
+    }
+
+    private void StandardMove()
+    {
         foreach (LayerMask layer in groundMask)
         {
             isGrounded = Physics.CheckSphere(m_Grounded.position, groundRadius, layer);
@@ -55,11 +64,7 @@ public class Enemy : MonoBehaviour
         {
             if (Vector3.Distance(transform.position, player.transform.position) <= detectionRadius)
             {
-                Vector3 directionRotation = player.transform.position - transform.position;
-                directionRotation = directionRotation.normalized;
-                float targetAngle = Mathf.Atan2(directionRotation.x, directionRotation.z) * Mathf.Rad2Deg;
-                float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-                transform.rotation = Quaternion.Euler(0f, angle, 0f);
+                RotateToDirection(player.transform.position);
 
                 if (Vector3.Distance(transform.position, player.transform.position) <= fleeRadius)
                 {
@@ -79,6 +84,21 @@ public class Enemy : MonoBehaviour
                     m_Rb.velocity = Seek(player.transform.position) * speed * Time.fixedDeltaTime;
                 }
             }
+            else
+            {
+                if (isForcedToSeek) 
+                {
+                    isForcedSeeking = true;
+                    isForcedToSeek = false;
+                    StartCoroutine("DisableForcedSeeking");
+                }
+
+                if (isForcedSeeking)
+                {
+                    RotateToDirection(player.transform.position);
+                    m_Rb.velocity = Seek(player.transform.position) * speed * Time.fixedDeltaTime;
+                }
+            }
 
             if (player.GetComponent<Hungerin>().isInsideCollapseRadius(transform.position)
                 && player.GetComponent<Hungerin>().isCollapsing)
@@ -86,14 +106,25 @@ public class Enemy : MonoBehaviour
                 // hacer un bool doOnce y un takedamage
                 Debug.Log("a");
             }
+
         }
         else
         {
             Vector3 gravity = globalGravity * gravityScale * Vector3.up;
             m_Rb.AddForce(gravity, ForceMode.Acceleration);
+            m_Rb.constraints = RigidbodyConstraints.None;
         }
-
     }
+
+    private void RotateToDirection(Vector3 target)
+    {
+        Vector3 directionRotation = target - transform.position;
+        directionRotation = directionRotation.normalized;
+        float targetAngle = Mathf.Atan2(directionRotation.x, directionRotation.z) * Mathf.Rad2Deg;
+        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+        transform.rotation = Quaternion.Euler(0f, angle, 0f);
+    }
+
     private Vector3 Seek(Vector3 _target)
     {
         Vector3 direction = _target - transform.position;
@@ -131,8 +162,15 @@ public class Enemy : MonoBehaviour
             Debug.Log(hit.collider.gameObject.name + " TakeDamage");
         }
     }
-
-
+    public void TakeDamage(float damage)
+    {
+        health -= damage;
+    }
+    IEnumerator DisableForcedSeeking()
+    {
+        yield return new WaitForSeconds(5f);
+        isForcedSeeking = false;
+    }
     IEnumerator DisableLineRenderer()
     {
         yield return new WaitForSeconds(0.5f);
