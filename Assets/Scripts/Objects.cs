@@ -20,15 +20,15 @@ public class Objects : MonoBehaviour
         {
             case (SizeType.SMALL):
                 sumSize = 2;
-                sumWeight = 1;
+                sumWeight = 0.1f;
                 break;
             case (SizeType.MEDIUM):
                 sumSize = 10;
-                sumWeight = 5;
+                sumWeight = 0.5f;
                 break;
             case (SizeType.BIG):
                 sumSize = 20;
-                sumWeight = 10;
+                sumWeight = 1f;
                 break;
             case (SizeType.DEFAULT):
                 Debug.Log("Forgot to init values");
