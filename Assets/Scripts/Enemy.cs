@@ -18,13 +18,25 @@ public class Enemy : MonoBehaviour
 
     [Space]
     [Header("Rotation physics")]
-    [SerializeField] private float turnSmoothTime;
+    [SerializeField] private float turnSmoothTime = 0.1f;
     private float turnSmoothVelocity;
     
     [Space]
     [Header("Attack physics")] 
     [SerializeField] private float attackRadius = 4f;
     private bool startAttack = true;
+
+    [Space]
+    [Header("Ground physics")]
+    [SerializeField] private Transform m_Grounded;
+    private bool isGrounded;
+    [SerializeField] private float groundRadius = 0.1f;
+    [SerializeField] private LayerMask[] groundMask;
+
+    [Space]
+    [Header("Gravity physics")]
+    [SerializeField] private float gravityScale = 10f;
+    [SerializeField] private float globalGravity = -9.81f;
 
     private void Awake()
     {
@@ -33,39 +45,54 @@ public class Enemy : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(Vector3.Distance(transform.position, player.transform.position) <= detectionRadius)
+        foreach (LayerMask layer in groundMask)
         {
-            //Vector3 directionRotation = target.position - transform.position;
-            //directionRotation = directionRotation.normalized;
-            //float targetAngle = Mathf.Atan2(directionRotation.x, directionRotation.z) * Mathf.Rad2Deg;
-            //float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            //transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            isGrounded = Physics.CheckSphere(m_Grounded.position, groundRadius, layer);
+            if (isGrounded) break;
+        }
 
-            if (Vector3.Distance(transform.position, player.transform.position) <= fleeRadius)
+        if (isGrounded)
+        {
+            if (Vector3.Distance(transform.position, player.transform.position) <= detectionRadius)
             {
-                m_Rb.velocity = Flee(player.transform.position) * speed * Time.fixedDeltaTime;
-            }
-            else if (Vector3.Distance(transform.position, player.transform.position) <= attackRadius)
-            {
-                m_Rb.velocity = Vector3.zero * speed * Time.fixedDeltaTime;
-                if (startAttack)
+                Vector3 directionRotation = player.transform.position - transform.position;
+                directionRotation = directionRotation.normalized;
+                float targetAngle = Mathf.Atan2(directionRotation.x, directionRotation.z) * Mathf.Rad2Deg;
+                float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+                transform.rotation = Quaternion.Euler(0f, angle, 0f);
+
+                if (Vector3.Distance(transform.position, player.transform.position) <= fleeRadius)
                 {
-                    startAttack = false;
-                    StartCoroutine("Attack");
+                    m_Rb.velocity = Flee(player.transform.position) * speed * Time.fixedDeltaTime;
+                }
+                else if (Vector3.Distance(transform.position, player.transform.position) <= attackRadius)
+                {
+                    m_Rb.velocity = Vector3.zero * speed * Time.fixedDeltaTime;
+                    if (startAttack)
+                    {
+                        startAttack = false;
+                        StartCoroutine("Attack");
+                    }
+                }
+                else
+                {
+                    m_Rb.velocity = Seek(player.transform.position) * speed * Time.fixedDeltaTime;
                 }
             }
-            else
+
+            if (player.GetComponent<Hungerin>().isInsideCollapseRadius(transform.position)
+                && player.GetComponent<Hungerin>().isCollapsing)
             {
-                m_Rb.velocity = Seek(player.transform.position) * speed * Time.fixedDeltaTime;
+                // hacer un bool doOnce y un takedamage
+                Debug.Log("a");
             }
         }
-        
-        if (player.GetComponent<Hungerin>().isInsideCollapseRadius(transform.position) 
-            && player.GetComponent<Hungerin>().isCollapsing)
+        else
         {
-            // hacer un bool doOnce y un takedamage
-            Debug.Log("a");
+            Vector3 gravity = globalGravity * gravityScale * Vector3.up;
+            m_Rb.AddForce(gravity, ForceMode.Acceleration);
         }
+
     }
     private Vector3 Seek(Vector3 _target)
     {
