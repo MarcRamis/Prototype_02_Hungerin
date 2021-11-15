@@ -108,6 +108,8 @@ public class Hungerin : MonoBehaviour
     // Here we make physics
     private void FixedUpdate()
     {
+        if (m_EssencialProperties.largeSize <= 0) { Debug.Log(name + " died"); }
+
         switch(m_TypeTransformation)
         {
             case TypeTransformation.NORMAL:
@@ -200,7 +202,7 @@ public class Hungerin : MonoBehaviour
                         LaunchToDirection(hit.collider.gameObject.transform.position);
                         StartCoroutine("PlayerIsForced");
                     }
-                }               
+                }
             }
             eatInputButton = false;
         }
@@ -381,7 +383,6 @@ public class Hungerin : MonoBehaviour
     {
         m_RigidBody.mass = weightEaten;
     }
-
     private void LaunchToDirection(Vector3 target)
     {
         Vector3 direction = target - transform.position;
@@ -389,7 +390,6 @@ public class Hungerin : MonoBehaviour
         
         m_RigidBody.AddForce(direction * launchDirectionAgainstMassForce + Vector3.up * launchUpDirectionAgainstMassForce, ForceMode.Acceleration);
     }
-
     private void DrawLineRenderer(Vector3 point)
     {
         m_LineRenderer.enabled = true;
@@ -398,7 +398,6 @@ public class Hungerin : MonoBehaviour
 
         StartCoroutine("DisableTongue");
     }
-
     private void ChangeFormTransformation()
     {
         switch (m_TypeTransformation)
@@ -416,11 +415,22 @@ public class Hungerin : MonoBehaviour
                 break;
         }
     }
-
     private Color NewColor(float r, float g, float b, float a)
     {
         return new Color(r/255, g/255, b/255, a/255);
     }
+
+    public bool isInsideCollapseRadius(Vector3 target)
+    {
+        float distanceAToB = Vector3.Distance(transform.position, target);
+        return distanceAToB <= collapseAttackRadius;
+    }
+
+    public void TakeDamage(float damage)
+    {
+        m_EssencialProperties.largeSize -= damage;
+    }
+
     IEnumerator DisableTongue()
     {
         yield return new WaitForSeconds(1f);
@@ -437,11 +447,8 @@ public class Hungerin : MonoBehaviour
         canDoubleJump = false;
         isCollapsing = false;
     }
-    public bool isInsideCollapseRadius(Vector3 target)
-    {
-        float distanceAToB = Vector3.Distance(transform.position, target);
-        return distanceAToB <= collapseAttackRadius;
-    }
+
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
