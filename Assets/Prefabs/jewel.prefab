@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6531501949776013148}
   - component: {fileID: -9000792197573793603}
   m_Layer: 0
-  m_Name: Jewel
+  m_Name: jewel
   m_TagString: CanBeEaten
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 2052459795112683686}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1.0717033, y: -2.4, z: -5.5495377}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
