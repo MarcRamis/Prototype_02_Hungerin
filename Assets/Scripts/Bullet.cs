@@ -19,5 +19,11 @@ public class Bullet : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        if (collision.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+        {
+            collision.collider.gameObject.GetComponent<Enemy>().TakeDamage(10f);
+            collision.collider.gameObject.GetComponent<Enemy>().isForcedToSeek = true;
+        }
     }
 }
