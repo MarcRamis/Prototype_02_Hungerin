@@ -1652,6 +1652,63 @@ MonoBehaviour:
   m_CameraActivatedEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1001 &994142464
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1718729396258466997, guid: 209faed8b68ef4646ba62f2d5cd7455a, type: 3}
+      propertyPath: m_Name
+      value: Crate (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2058699093436380687, guid: 209faed8b68ef4646ba62f2d5cd7455a, type: 3}
+      propertyPath: m_RootOrder
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2058699093436380687, guid: 209faed8b68ef4646ba62f2d5cd7455a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 2058699093436380687, guid: 209faed8b68ef4646ba62f2d5cd7455a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.6449995
+      objectReference: {fileID: 0}
+    - target: {fileID: 2058699093436380687, guid: 209faed8b68ef4646ba62f2d5cd7455a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.205
+      objectReference: {fileID: 0}
+    - target: {fileID: 2058699093436380687, guid: 209faed8b68ef4646ba62f2d5cd7455a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2058699093436380687, guid: 209faed8b68ef4646ba62f2d5cd7455a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2058699093436380687, guid: 209faed8b68ef4646ba62f2d5cd7455a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2058699093436380687, guid: 209faed8b68ef4646ba62f2d5cd7455a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2058699093436380687, guid: 209faed8b68ef4646ba62f2d5cd7455a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2058699093436380687, guid: 209faed8b68ef4646ba62f2d5cd7455a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2058699093436380687, guid: 209faed8b68ef4646ba62f2d5cd7455a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 209faed8b68ef4646ba62f2d5cd7455a, type: 3}
 --- !u!4 &995515006 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1106231020931231197, guid: 772ab7c3fee34c748a6d59159aa95b10, type: 3}
@@ -3274,6 +3331,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1507763486, guid: 613899251f164b6499c5e6376f954225, type: 3}
+      propertyPath: grappledObjectLaunchSpeed
+      value: 1000
+      objectReference: {fileID: 0}
     - target: {fileID: 7558310379913836272, guid: 613899251f164b6499c5e6376f954225, type: 3}
       propertyPath: m_Name
       value: Hungerin

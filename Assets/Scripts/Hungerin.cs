@@ -73,9 +73,13 @@ public class Hungerin : MonoBehaviour
     public bool isCollapsing { get; set; }
 
     [Space]
-    [Header("Grapple physics")]
+    [Header("Tongue attack physics")]
     private bool isGrappeling = false;
-
+    private bool isCarryingUp = false;
+    private GameObject grabObj;
+    [SerializeField] private float grappledObjectWhenMovingRadius = 0.5f;
+    [SerializeField] private float grappledObjectLaunchSpeed = 200f;
+    
     private void Awake()
     {
         m_RigidBody.mass = m_EssencialProperties.weight;
@@ -173,7 +177,9 @@ public class Hungerin : MonoBehaviour
     }
     private void UseTongue()
     {
-        if (eatInputButton)
+
+
+        if (eatInputButton && !isGrappeling)
         {
             Vector3 direction = m_Target.position - transform.position;
             Ray raycastTarget = new Ray(transform.position, direction.normalized);
@@ -181,21 +187,31 @@ public class Hungerin : MonoBehaviour
 
             if (Physics.Raycast(raycastTarget, out hit, maxTongueDistance))
             {
-                DrawLineRenderer(hit.point);
+                DrawLineRenderer(transform.position,hit.point);
 
                 if (hit.collider.gameObject.layer == LayerMask.NameToLayer("EatenItem"))
                 {
-                    if (hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.EATEN && !isGrappeling) {
+                    if (hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.EATEN) {
                         Eat(hit);
                     }
                     else if(hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.GRIPPY)
                     {
                         Grapple(hit);
                     }
-                   
                 }
             }
             eatInputButton = false;
+        }
+        else if (eatInputButton && isGrappeling && grabObj != null)
+        {
+            GrappleLaunch(grabObj);
+            isGrappeling = false;
+            eatInputButton = false;
+        }
+
+        if (isCarryingUp)
+        {
+            MoveGrappledObject();
         }
     }
     private void Eat(RaycastHit hit)
@@ -210,7 +226,6 @@ public class Hungerin : MonoBehaviour
             tempProperties.largeSize = hit.transform.gameObject.GetComponent<Objects>().GetSumSize();
             tempProperties.weight = hit.transform.gameObject.GetComponent<Objects>().GetSumWeight();
             eatenGameObjects.Push(tempProperties);
-            //
 
             hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
 
@@ -229,11 +244,39 @@ public class Hungerin : MonoBehaviour
     private void Grapple(RaycastHit hit)
     {
         // Hit represents with raycast has collided
-        hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer2(m_SpitSpawn.position);
         isGrappeling = true;
+        grabObj = hit.collider.gameObject;
+        isCarryingUp = true;
     }
-    private void GrappleLaunch()
+    private void MoveGrappledObject()
     {
+        float distance = Vector3.Distance(grabObj.transform.position, m_SpitSpawn.position);
+
+        if (distance <= grappledObjectWhenMovingRadius)
+        {
+            isCarryingUp = false;
+            grabObj.GetComponent<Rigidbody>().transform.parent = m_SpitSpawn;
+            grabObj.GetComponent<Rigidbody>().useGravity = false;
+            grabObj.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+            grabObj.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        }
+        else
+        {
+            Vector3 direction = m_SpitSpawn.position - grabObj.transform.position;
+            direction = direction.normalized;
+            grabObj.GetComponent<Rigidbody>().velocity = direction * 10;
+        }
+    }
+    private void GrappleLaunch(GameObject item)
+    {
+        Vector3 direction = m_Target.transform.position - item.transform.position;
+        direction = direction.normalized;
+
+        item.GetComponent<Rigidbody>().AddForce(direction * grappledObjectLaunchSpeed, ForceMode.Acceleration);
+
+        grabObj.GetComponent<Rigidbody>().transform.parent = null;
+        grabObj.GetComponent<Rigidbody>().useGravity = true;
+        grabObj.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
     }
     private void UseSpit()
     {
@@ -418,11 +461,11 @@ public class Hungerin : MonoBehaviour
         
         m_RigidBody.AddForce(direction * launchDirectionAgainstMassForce + Vector3.up * launchUpDirectionAgainstMassForce, ForceMode.Acceleration);
     }
-    private void DrawLineRenderer(Vector3 point)
+    private void DrawLineRenderer(Vector3 start, Vector3 end)
     {
         m_LineRenderer.enabled = true;
-        m_LineRenderer.SetPosition(0, transform.position);
-        m_LineRenderer.SetPosition(1, point);
+        m_LineRenderer.SetPosition(0, start);
+        m_LineRenderer.SetPosition(1, end);
 
         StartCoroutine("DisableTongue");
     }
@@ -476,8 +519,6 @@ public class Hungerin : MonoBehaviour
         isCollapsing = false;
     }
 
-
-    
     public float GetWeight() { return m_EssencialProperties.weight; }
 
     private void OnDrawGizmos()
@@ -492,5 +533,8 @@ public class Hungerin : MonoBehaviour
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, collapseAttackRadius);
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(m_SpitSpawn.position, grappledObjectWhenMovingRadius);
     }
 }

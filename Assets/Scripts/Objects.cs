@@ -13,10 +13,11 @@ public class Objects : MonoBehaviour
     private float sumSize = 0.0f;
     private float sumWeight = 0.0f;
     private float speedToTarget = 800f;
-    
+
     private void Awake()
     {
         m_Rigidbody = gameObject.GetComponent<Rigidbody>();
+        m_essencialProperties.weight = 1;
         m_Rigidbody.mass = m_essencialProperties.weight;
         switch(typeObj)
         {
@@ -57,16 +58,6 @@ public class Objects : MonoBehaviour
         m_Rigidbody.AddForce(direction * speedToTarget, ForceMode.Acceleration);
         this.gameObject.tag = "Untagged";
         StartCoroutine("DestroyItself");
-    }
-
-    public void MoveToPlayer2(Vector3 target)
-    {
-        Vector3 direction = target - transform.position;
-        direction = direction.normalized;
-
-        m_Rigidbody.AddForce(direction * speedToTarget, ForceMode.Acceleration);
-        //this.gameObject.tag = "Untagged";
-        //StartCoroutine("DestroyItself");
     }
 
     IEnumerator DestroyItself()

@@ -99,7 +99,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_essencialProperties:
     largeSize: 0
-    weight: 0
+    weight: 1
   typeObj: 0
   itype: 1
 --- !u!54 &919132148719032396
