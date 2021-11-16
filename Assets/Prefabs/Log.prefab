@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 7562288918746937080}
   - component: {fileID: 1112061121}
   - component: {fileID: 1112061122}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Log
-  m_TagString: CanBeEaten
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -101,6 +101,7 @@ MonoBehaviour:
     largeSize: 10
     weight: 10
   typeObj: 1
+  type: 0
 --- !u!54 &1112061121
 Rigidbody:
   m_ObjectHideFlags: 0

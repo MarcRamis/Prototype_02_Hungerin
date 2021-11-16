@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class Objects : MonoBehaviour
 {
-    private enum SizeType { SMALL, MEDIUM, BIG, DEFAULT}; 
+    public enum ItemType { EATEN, GRIPPY, POWERUP_COLLAPSE };
+    private enum SizeType { SMALL, MEDIUM, BIG, DEFAULT };
     private Rigidbody m_Rigidbody;
     [SerializeField] private EssencialProperties m_essencialProperties;
     [SerializeField] private SizeType typeObj = SizeType.DEFAULT;
+    [SerializeField] private ItemType itype = ItemType.EATEN;
     private float sumSize = 0.0f;
     private float sumWeight = 0.0f;
     private float speedToTarget = 800f;
@@ -46,6 +48,7 @@ public class Objects : MonoBehaviour
 
     public float GetSumSize() { return sumSize; }
 
+    public ItemType GetEType() { return itype; }
     public void MoveToPlayer(Vector3 target)
     {
         Vector3 direction = target - transform.position;
@@ -54,6 +57,16 @@ public class Objects : MonoBehaviour
         m_Rigidbody.AddForce(direction * speedToTarget, ForceMode.Acceleration);
         this.gameObject.tag = "Untagged";
         StartCoroutine("DestroyItself");
+    }
+
+    public void MoveToPlayer2(Vector3 target)
+    {
+        Vector3 direction = target - transform.position;
+        direction = direction.normalized;
+
+        m_Rigidbody.AddForce(direction * speedToTarget, ForceMode.Acceleration);
+        //this.gameObject.tag = "Untagged";
+        //StartCoroutine("DestroyItself");
     }
 
     IEnumerator DestroyItself()

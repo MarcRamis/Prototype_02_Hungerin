@@ -71,7 +71,11 @@ public class Hungerin : MonoBehaviour
     [SerializeField] private float collapseAttackRadius = 10f;
     private bool canDoubleJump = false;
     public bool isCollapsing { get; set; }
-    
+
+    [Space]
+    [Header("Grapple physics")]
+    private bool isGrappeling = false;
+
     private void Awake()
     {
         m_RigidBody.mass = m_EssencialProperties.weight;
@@ -178,35 +182,58 @@ public class Hungerin : MonoBehaviour
             if (Physics.Raycast(raycastTarget, out hit, maxTongueDistance))
             {
                 DrawLineRenderer(hit.point);
-                if (hit.collider.tag == "CanBeEaten")
-                {
-                    // If player is bigger than this gameobject
-                    if(m_EssencialProperties.largeSize >= hit.collider.gameObject.GetComponent<Objects>().GetLargeSize())
-                    {
-                        //He stores the object eaten
-                        EssencialProperties tempProperties;
-                        tempProperties.largeSize = hit.transform.gameObject.GetComponent<Objects>().GetSumSize();
-                        tempProperties.weight = hit.transform.gameObject.GetComponent<Objects>().GetSumWeight();
-                        eatenGameObjects.Push(tempProperties);
-                        //
 
-                        hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
-                        
-                        SumSize(hit.collider.gameObject.GetComponent<Objects>().GetSumSize());
-                        MaxScalarSize(hit.collider.gameObject.GetComponent<Objects>().GetSumSize());
-                        SumWeight(hit.collider.gameObject.GetComponent<Objects>().GetSumWeight());
-                        SetNewMass(m_EssencialProperties.weight);
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("EatenItem"))
+                {
+                    if (hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.EATEN && !isGrappeling) {
+                        Eat(hit);
                     }
-                    else
+                    else if(hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.GRIPPY)
                     {
-                        playerIsForced = true;
-                        LaunchToDirection(hit.collider.gameObject.transform.position);
-                        StartCoroutine("PlayerIsForced");
+                        Grapple(hit);
                     }
+                   
                 }
             }
             eatInputButton = false;
         }
+    }
+    private void Eat(RaycastHit hit)
+    {
+        // Hit represents with raycast has collided
+
+        // If player is bigger than this gameobject
+        if (m_EssencialProperties.largeSize >= hit.collider.gameObject.GetComponent<Objects>().GetLargeSize())
+        {
+            //He stores the object eaten
+            EssencialProperties tempProperties;
+            tempProperties.largeSize = hit.transform.gameObject.GetComponent<Objects>().GetSumSize();
+            tempProperties.weight = hit.transform.gameObject.GetComponent<Objects>().GetSumWeight();
+            eatenGameObjects.Push(tempProperties);
+            //
+
+            hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
+
+            SumSize(hit.collider.gameObject.GetComponent<Objects>().GetSumSize());
+            MaxScalarSize(hit.collider.gameObject.GetComponent<Objects>().GetSumSize());
+            SumWeight(hit.collider.gameObject.GetComponent<Objects>().GetSumWeight());
+            SetNewMass(m_EssencialProperties.weight);
+        }
+        else
+        {
+            playerIsForced = true;
+            LaunchToDirection(hit.collider.gameObject.transform.position);
+            StartCoroutine("PlayerIsForced");
+        }
+    }
+    private void Grapple(RaycastHit hit)
+    {
+        // Hit represents with raycast has collided
+        hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer2(m_SpitSpawn.position);
+        isGrappeling = true;
+    }
+    private void GrappleLaunch()
+    {
     }
     private void UseSpit()
     {
