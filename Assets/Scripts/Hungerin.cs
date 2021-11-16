@@ -405,11 +405,11 @@ public class Hungerin : MonoBehaviour
         {
             case TypeTransformation.NORMAL:
                 m_Material.color = NewColor(47,39,183,255);
-                gravityScale = 10;
+                gravityScale = 15;
                 break;
             case TypeTransformation.COLLAPSE:
                 m_Material.color = NewColor(183, 39, 177, 255);
-                gravityScale = 5;
+                gravityScale = 10;
                 break;
             default:
                 Debug.Log("Error type transformation");

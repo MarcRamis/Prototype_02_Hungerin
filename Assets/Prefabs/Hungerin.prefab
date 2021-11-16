@@ -454,7 +454,7 @@ MonoBehaviour:
   - serializedVersion: 2
     m_Bits: 64
   turnSmoothTime: 0.1
-  gravityScale: 10
+  gravityScale: 15
   globalGravity: -9.81
   gravityCollapseScale: 20
   maxTongueDistance: 5
