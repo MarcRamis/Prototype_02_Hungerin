@@ -13,17 +13,15 @@ public class Bullet : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        //GameObject effect = Instantiate(hitEffect,transform.position,Quaternion.identity);
-        //Destroy(effect,5f);
         if(collision.collider.gameObject.layer != LayerMask.NameToLayer("Player"))
         {
-            Destroy(gameObject);
-        }
+            if (collision.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+            {
+                collision.collider.gameObject.GetComponent<Enemy>().TakeDamage(50f);
+                collision.collider.gameObject.GetComponent<Enemy>().isForcedToSeek = true;
+            }
 
-        if (collision.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
-        {
-            collision.collider.gameObject.GetComponent<Enemy>().TakeDamage(10f);
-            collision.collider.gameObject.GetComponent<Enemy>().isForcedToSeek = true;
+            Destroy(gameObject);
         }
     }
 }

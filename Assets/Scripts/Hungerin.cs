@@ -150,9 +150,10 @@ public class Hungerin : MonoBehaviour
         
         if (isGrounded)
         {
-            if (Input.GetButton("Jump"))
+            if (spaceInputButton)
             {
                 m_RigidBody.AddForce(new Vector3(direction.x * jumpForwardSpeed, jumpSpeed, direction.z * jumpForwardSpeed), ForceMode.Impulse);
+                spaceInputButton = false;
             }
 
             if (!playerIsForced)
@@ -404,11 +405,11 @@ public class Hungerin : MonoBehaviour
         {
             case TypeTransformation.NORMAL:
                 m_Material.color = NewColor(47,39,183,255);
-                gravityScale = 20;
+                gravityScale = 10;
                 break;
             case TypeTransformation.COLLAPSE:
                 m_Material.color = NewColor(183, 39, 177, 255);
-                gravityScale = 10;
+                gravityScale = 5;
                 break;
             default:
                 Debug.Log("Error type transformation");
@@ -460,6 +461,9 @@ public class Hungerin : MonoBehaviour
         Gizmos.DrawLine(transform.position, m_Target.position);
         
         Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(transform.position, maxTongueDistance);
+
+        Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, collapseAttackRadius);
     }
 }

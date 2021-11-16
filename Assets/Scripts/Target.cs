@@ -13,11 +13,7 @@ public class Target : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit))
         {
-            
             transform.position = hit.point + new Vector3(0.0f, 0.01f, 0.0f);
-            Debug.Log(hit.transform.gameObject);
-            
-            
         }
     }
 }

@@ -445,7 +445,7 @@ MonoBehaviour:
   m_EssencialProperties:
     largeSize: 1
     weight: 1
-  speed: 300
+  speed: 200
   jumpSpeed: 15
   jumpForwardSpeed: 2
   m_Grounded: {fileID: 7558310380250868357}
@@ -457,7 +457,7 @@ MonoBehaviour:
   gravityScale: 10
   globalGravity: -9.81
   gravityCollapseScale: 20
-  maxTongueDistance: 10
+  maxTongueDistance: 5
   maxSize: 2.5
   minSize: 0.3
   launchDirectionAgainstMassForce: 2000
@@ -466,7 +466,7 @@ MonoBehaviour:
   minLargeSize: 0
   m_SpitSpawn: {fileID: 1857337520}
   bulletPrefab: {fileID: 1928512621476752723, guid: b0d49576a4e47e040a06ccae2a016676, type: 3}
-  bulletSpeed: 30
+  bulletSpeed: 15
   m_TypeTransformation: 0
   collapseAttackRadius: 3
 --- !u!120 &511783492
