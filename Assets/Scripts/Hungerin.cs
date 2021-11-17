@@ -71,6 +71,14 @@ public class Hungerin : MonoBehaviour
     [SerializeField] private float collapseAttackRadius = 10f;
     private bool canDoubleJump = false;
     public bool isCollapsing { get; set; }
+
+    [Space]
+    [Header("Tongue attack physics")]
+    private bool isGrappeling = false;
+    private bool isCarryingUp = false;
+    private GameObject grabObj;
+    [SerializeField] private float grappledObjectWhenMovingRadius = 0.5f;
+    [SerializeField] private float grappledObjectLaunchSpeed = 200f;
     
     private void Awake()
     {
@@ -169,7 +177,9 @@ public class Hungerin : MonoBehaviour
     }
     private void UseTongue()
     {
-        if (eatInputButton)
+
+
+        if (eatInputButton && !isGrappeling && !isCarryingUp)
         {
             Vector3 direction = m_Target.position - transform.position;
             Ray raycastTarget = new Ray(transform.position, direction.normalized);
@@ -177,36 +187,100 @@ public class Hungerin : MonoBehaviour
 
             if (Physics.Raycast(raycastTarget, out hit, maxTongueDistance))
             {
-                DrawLineRenderer(hit.point);
-                if (hit.collider.tag == "CanBeEaten")
-                {
-                    // If player is bigger than this gameobject
-                    if(m_EssencialProperties.largeSize >= hit.collider.gameObject.GetComponent<Objects>().GetLargeSize())
-                    {
-                        //He stores the object eaten
-                        EssencialProperties tempProperties;
-                        tempProperties.largeSize = hit.transform.gameObject.GetComponent<Objects>().GetSumSize();
-                        tempProperties.weight = hit.transform.gameObject.GetComponent<Objects>().GetSumWeight();
-                        eatenGameObjects.Push(tempProperties);
-                        //
+                DrawLineRenderer(transform.position,hit.point);
 
-                        hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
-                        
-                        SumSize(hit.collider.gameObject.GetComponent<Objects>().GetSumSize());
-                        MaxScalarSize(hit.collider.gameObject.GetComponent<Objects>().GetSumSize());
-                        SumWeight(hit.collider.gameObject.GetComponent<Objects>().GetSumWeight());
-                        SetNewMass(m_EssencialProperties.weight);
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("EatenItem"))
+                {
+                    if (hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.EATEN) {
+                        Eat(hit);
                     }
-                    else
+                    else if(hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.GRIPPY)
                     {
-                        playerIsForced = true;
-                        LaunchToDirection(hit.collider.gameObject.transform.position);
-                        StartCoroutine("PlayerIsForced");
+                        Grapple(hit);
                     }
                 }
             }
             eatInputButton = false;
         }
+        else if (eatInputButton && isGrappeling && grabObj != null && !isCarryingUp)
+        {
+            GrappleLaunch();
+            isGrappeling = false;
+            eatInputButton = false;
+        }
+
+        else if (isCarryingUp)
+        {
+            MoveGrappledObject();
+        }
+    }
+    private void Eat(RaycastHit hit)
+    {
+        // Hit represents with raycast has collided
+
+        // If player is bigger than this gameobject
+        if (m_EssencialProperties.largeSize >= hit.collider.gameObject.GetComponent<Objects>().GetLargeSize())
+        {
+            //He stores the object eaten
+            EssencialProperties tempProperties;
+            tempProperties.largeSize = hit.transform.gameObject.GetComponent<Objects>().GetSumSize();
+            tempProperties.weight = hit.transform.gameObject.GetComponent<Objects>().GetSumWeight();
+            eatenGameObjects.Push(tempProperties);
+
+            hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
+
+            SumSize(hit.collider.gameObject.GetComponent<Objects>().GetSumSize());
+            MaxScalarSize(hit.collider.gameObject.GetComponent<Objects>().GetSumSize());
+            SumWeight(hit.collider.gameObject.GetComponent<Objects>().GetSumWeight());
+            SetNewMass(m_EssencialProperties.weight);
+        }
+        else
+        {
+            playerIsForced = true;
+            LaunchToDirection(hit.collider.gameObject.transform.position);
+            StartCoroutine("PlayerIsForced");
+        }
+    }
+    private void Grapple(RaycastHit hit)
+    {
+        // Hit represents with raycast has collided
+        isGrappeling = true;
+        grabObj = hit.collider.gameObject;
+        isCarryingUp = true;
+    }
+    private void MoveGrappledObject()
+    {
+        float distance = Vector3.Distance(grabObj.transform.position, m_SpitSpawn.position);
+
+        if (distance <= grappledObjectWhenMovingRadius)
+        {
+            isCarryingUp = false;
+            grabObj.GetComponent<Rigidbody>().transform.parent = m_SpitSpawn;
+            grabObj.GetComponent<Rigidbody>().useGravity = false;
+            grabObj.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+            grabObj.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        }
+        else
+        {
+            Vector3 direction = m_SpitSpawn.position - grabObj.transform.position;
+            direction = direction.normalized;
+            grabObj.GetComponent<Rigidbody>().velocity = direction * 10;
+        }
+    }
+    private void GrappleLaunch()
+    {
+        // I set this to true to control enemy damage. Now is like a bullet
+        grabObj.GetComponent<Objects>().isBeingLaunched = true;
+        Debug.Log(grabObj.GetComponent<Objects>().isBeingLaunched);
+        // Force direction
+        Vector3 direction = m_Target.transform.position - grabObj.transform.position;
+        direction = direction.normalized;
+        grabObj.GetComponent<Rigidbody>().AddForce(direction * grappledObjectLaunchSpeed, ForceMode.Acceleration);
+
+        // Dettach from player
+        grabObj.GetComponent<Rigidbody>().transform.parent = null;
+        grabObj.GetComponent<Rigidbody>().useGravity = true;
+        grabObj.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
     }
     private void UseSpit()
     {
@@ -391,11 +465,11 @@ public class Hungerin : MonoBehaviour
         
         m_RigidBody.AddForce(direction * launchDirectionAgainstMassForce + Vector3.up * launchUpDirectionAgainstMassForce, ForceMode.Acceleration);
     }
-    private void DrawLineRenderer(Vector3 point)
+    private void DrawLineRenderer(Vector3 start, Vector3 end)
     {
         m_LineRenderer.enabled = true;
-        m_LineRenderer.SetPosition(0, transform.position);
-        m_LineRenderer.SetPosition(1, point);
+        m_LineRenderer.SetPosition(0, start);
+        m_LineRenderer.SetPosition(1, end);
 
         StartCoroutine("DisableTongue");
     }
@@ -449,8 +523,6 @@ public class Hungerin : MonoBehaviour
         isCollapsing = false;
     }
 
-
-    
     public float GetWeight() { return m_EssencialProperties.weight; }
 
     private void OnDrawGizmos()
@@ -465,5 +537,8 @@ public class Hungerin : MonoBehaviour
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, collapseAttackRadius);
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(m_SpitSpawn.position, grappledObjectWhenMovingRadius);
     }
 }

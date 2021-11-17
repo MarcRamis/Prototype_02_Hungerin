@@ -4,17 +4,22 @@ using UnityEngine;
 
 public class Objects : MonoBehaviour
 {
-    private enum SizeType { SMALL, MEDIUM, BIG, DEFAULT}; 
+    public enum ItemType { EATEN, GRIPPY, POWERUP_COLLAPSE };
+    private enum SizeType { SMALL, MEDIUM, BIG, DEFAULT };
     private Rigidbody m_Rigidbody;
     [SerializeField] private EssencialProperties m_essencialProperties;
     [SerializeField] private SizeType typeObj = SizeType.DEFAULT;
+    [SerializeField] private ItemType itype = ItemType.EATEN;
     private float sumSize = 0.0f;
     private float sumWeight = 0.0f;
     private float speedToTarget = 800f;
-    
+
+    public bool isBeingLaunched { get; set; }
+
     private void Awake()
     {
         m_Rigidbody = gameObject.GetComponent<Rigidbody>();
+        m_essencialProperties.weight = 1;
         m_Rigidbody.mass = m_essencialProperties.weight;
         switch(typeObj)
         {
@@ -46,6 +51,7 @@ public class Objects : MonoBehaviour
 
     public float GetSumSize() { return sumSize; }
 
+    public ItemType GetEType() { return itype; }
     public void MoveToPlayer(Vector3 target)
     {
         Vector3 direction = target - transform.position;
@@ -60,5 +66,29 @@ public class Objects : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         Destroy(this.gameObject);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.gameObject.layer != LayerMask.NameToLayer("Player") 
+            && isBeingLaunched)
+        {
+            Debug.Log(collision.collider.gameObject);
+
+            if (collision.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+            {
+                collision.collider.gameObject.GetComponent<Enemy>().TakeDamage(100f);
+                collision.collider.gameObject.GetComponent<Enemy>().isForcedToSeek = true;
+
+                isBeingLaunched = false;
+            }
+            StartCoroutine("DisableIsBeingLaunched");
+        }
+    }
+
+    IEnumerator DisableIsBeingLaunched()
+    {
+        yield return new WaitForSeconds(0.5f);
+        isBeingLaunched = false;
     }
 }
