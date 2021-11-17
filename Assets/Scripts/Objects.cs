@@ -14,6 +14,8 @@ public class Objects : MonoBehaviour
     private float sumWeight = 0.0f;
     private float speedToTarget = 800f;
 
+    public bool isBeingLaunched { get; set; }
+
     private void Awake()
     {
         m_Rigidbody = gameObject.GetComponent<Rigidbody>();
@@ -64,5 +66,29 @@ public class Objects : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         Destroy(this.gameObject);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.gameObject.layer != LayerMask.NameToLayer("Player") 
+            && isBeingLaunched)
+        {
+            Debug.Log(collision.collider.gameObject);
+
+            if (collision.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+            {
+                collision.collider.gameObject.GetComponent<Enemy>().TakeDamage(100f);
+                collision.collider.gameObject.GetComponent<Enemy>().isForcedToSeek = true;
+
+                isBeingLaunched = false;
+            }
+            StartCoroutine("DisableIsBeingLaunched");
+        }
+    }
+
+    IEnumerator DisableIsBeingLaunched()
+    {
+        yield return new WaitForSeconds(0.5f);
+        isBeingLaunched = false;
     }
 }

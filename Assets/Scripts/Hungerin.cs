@@ -204,7 +204,7 @@ public class Hungerin : MonoBehaviour
         }
         else if (eatInputButton && isGrappeling && grabObj != null && !isCarryingUp)
         {
-            GrappleLaunch(grabObj);
+            GrappleLaunch();
             isGrappeling = false;
             eatInputButton = false;
         }
@@ -267,13 +267,17 @@ public class Hungerin : MonoBehaviour
             grabObj.GetComponent<Rigidbody>().velocity = direction * 10;
         }
     }
-    private void GrappleLaunch(GameObject item)
+    private void GrappleLaunch()
     {
-        Vector3 direction = m_Target.transform.position - item.transform.position;
+        // I set this to true to control enemy damage. Now is like a bullet
+        grabObj.GetComponent<Objects>().isBeingLaunched = true;
+        Debug.Log(grabObj.GetComponent<Objects>().isBeingLaunched);
+        // Force direction
+        Vector3 direction = m_Target.transform.position - grabObj.transform.position;
         direction = direction.normalized;
+        grabObj.GetComponent<Rigidbody>().AddForce(direction * grappledObjectLaunchSpeed, ForceMode.Acceleration);
 
-        item.GetComponent<Rigidbody>().AddForce(direction * grappledObjectLaunchSpeed, ForceMode.Acceleration);
-
+        // Dettach from player
         grabObj.GetComponent<Rigidbody>().transform.parent = null;
         grabObj.GetComponent<Rigidbody>().useGravity = true;
         grabObj.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
