@@ -4,19 +4,26 @@ using UnityEngine;
 
 public class Objects : MonoBehaviour
 {
-    private enum SizeType { SMALL, MEDIUM, BIG, DEFAULT}; 
+    private enum SizeType { SMALL, MEDIUM, BIG, DEFAULT};
+    public enum ObjType {  JEWEL, LOG, LOGSTACK, DEFAULT };
     private Rigidbody m_Rigidbody;
     [SerializeField] private EssencialProperties m_essencialProperties;
     [SerializeField] private SizeType typeObj = SizeType.DEFAULT;
+    [SerializeField] private ObjType objectItIs = ObjType.DEFAULT;
     private float sumSize = 0.0f;
     private float sumWeight = 0.0f;
     private float speedToTarget = 800f;
-    
+    public Vector3 originalPos { get; set; }
+    public Quaternion originalRot { get; set; }
+
     private void Awake()
     {
         m_Rigidbody = gameObject.GetComponent<Rigidbody>();
         m_Rigidbody.mass = m_essencialProperties.weight;
-        switch(typeObj)
+        originalPos = transform.position;
+        originalRot = transform.localRotation;
+
+        switch (typeObj)
         {
             case (SizeType.SMALL):
                 sumSize = 2;
@@ -46,6 +53,8 @@ public class Objects : MonoBehaviour
 
     public float GetSumSize() { return sumSize; }
 
+    //public Transform GetOriginalTrans() { return originalPos; }
+    public ObjType GetObjItIs() { return objectItIs; }
     public void MoveToPlayer(Vector3 target)
     {
         Vector3 direction = target - transform.position;

@@ -9,8 +9,8 @@ public class Fragile_WoodPlatform : MonoBehaviour
 
     public void DropPlatform()
     {
-        this.gameObject.GetComponent<Rigidbody>().useGravity = true;
-        this.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+        this.gameObject.GetComponentInParent<Rigidbody>().useGravity = true;
+        this.gameObject.GetComponentInParent<Rigidbody>().constraints = RigidbodyConstraints.None;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -18,12 +18,12 @@ public class Fragile_WoodPlatform : MonoBehaviour
         if (other.gameObject.tag == "Player")
         {
             Debug.Log(other.gameObject.GetComponent<Rigidbody>().velocity.y);
-            if (other.gameObject.GetComponent<Hungerin>().GetWeight() >= weightToBreak && other.gameObject.GetComponent<Rigidbody>().velocity.y > 0.0f)
+            if (other.gameObject.GetComponent<Hungerin>().GetWeight() >= weightToBreak && other.gameObject.GetComponent<Rigidbody>().velocity.y < 0.0f)
             {
 
                 foreach(GameObject platform in nearPlatforms)
                 {
-                    platform.GetComponent<Fragile_WoodPlatform>().DropPlatform();
+                    platform.GetComponentInChildren<Fragile_WoodPlatform>().DropPlatform();
                 }
             }
         }

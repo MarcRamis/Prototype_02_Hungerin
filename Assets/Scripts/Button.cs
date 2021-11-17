@@ -19,6 +19,8 @@ public class Button : MonoBehaviour
     private bool doOnce = false;
     private Vector3 vectorToRotate = Vector3.zero;
     private Vector3 position = Vector3.zero;
+    private Vector3 originalPosButton = Vector3.zero;
+    private bool activateDoor = false;
 
     // Start is called before the first frame update
     void Start()
@@ -36,11 +38,12 @@ public class Button : MonoBehaviour
                 break;
         }
 
-        position = transform.position;
+        position = interactuableGameObjects[0].transform.position;
+        originalPosButton = buttonZone.transform.position;
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (activate && !doOnce)
             switch (typeAction)
@@ -88,15 +91,16 @@ public class Button : MonoBehaviour
                     }
                     break;
                 case (ButtonActivate.DOOR):
-                    interactuableGameObjects[0].GetComponent<Rigidbody>().velocity = Vector3.up * 5.0f * Time.fixedDeltaTime;
+                    //interactuableGameObjects[0].GetComponent<Rigidbody>().velocity = Vector3.up * 5.0f * Time.fixedDeltaTime;
                     
-                    if(interactuableGameObjects[0].transform.position.y > position.y + howMuchToOpenDoor)
+                    interactuableGameObjects[0].transform.position = Vector3.Lerp(interactuableGameObjects[0].transform.position, new Vector3(position.x, position.y + howMuchToOpenDoor, position.z), 0.1f);
+                    if (interactuableGameObjects[0].transform.position.y > position.y + howMuchToOpenDoor)
                     {
-                        interactuableGameObjects[0].GetComponent<Rigidbody>().velocity = Vector3.zero;
+                        //interactuableGameObjects[0].GetComponent<Rigidbody>().velocity = Vector3.zero;
                         interactuableGameObjects[0].transform.position.Set(interactuableGameObjects[0].transform.position.x, interactuableGameObjects[0].transform.position.y + howMuchToOpenDoor, interactuableGameObjects[0].transform.position.z);
                         doOnce = true;
                     }
-                    
+
                     break;
                 case (ButtonActivate.DEFAULT):
                     Debug.Log("Forgot to put what does this button do");
@@ -105,16 +109,30 @@ public class Button : MonoBehaviour
                     Debug.Log("This script doesn't detect the enum");
                     break;
             }
+
+        if(activateDoor)
+        {
+            interactuableGameObjects[0].transform.position = Vector3.Lerp(interactuableGameObjects[0].transform.position, new Vector3(position.x, position.y + howMuchToOpenDoor, position.z), 0.1f);
+            if (interactuableGameObjects[0].transform.position.y > position.y + howMuchToOpenDoor)
+            {
+                //interactuableGameObjects[0].GetComponent<Rigidbody>().velocity = Vector3.zero;
+                interactuableGameObjects[0].transform.position.Set(interactuableGameObjects[0].transform.position.x, interactuableGameObjects[0].transform.position.y + howMuchToOpenDoor, interactuableGameObjects[0].transform.position.z);
+                activateDoor = false;
+            }
+        }
+
+
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "Player")
+        if(other.gameObject.tag == "Player" && !doOnce)
         {
-            if(other.gameObject.GetComponent<Hungerin>().GetWeight() >= minWeight && !doOnce)
+            
+            if (other.gameObject.GetComponent<Hungerin>().GetWeight() >= minWeight)
             {
                 //Activa lo que haga el boton
-                buttonZone.transform.position = new Vector3(0, 0.01f, 0);
+                buttonZone.transform.position = new Vector3(buttonZone.transform.position.x, buttonZone.transform.position.y - 0.045f, buttonZone.transform.position.z);
                 switch (typeAction)
                 {
                     case (ButtonActivate.BRIDGE):
@@ -160,15 +178,8 @@ public class Button : MonoBehaviour
                         }
                         break;
                     case (ButtonActivate.DOOR):
-                        interactuableGameObjects[0].GetComponent<Rigidbody>().velocity = Vector3.up * 5.0f * Time.fixedDeltaTime;
-
-                        if (interactuableGameObjects[0].transform.position.y > position.y + howMuchToOpenDoor)
-                        {
-                            interactuableGameObjects[0].GetComponent<Rigidbody>().velocity = Vector3.zero;
-                            interactuableGameObjects[0].transform.position.Set(interactuableGameObjects[0].transform.position.x, interactuableGameObjects[0].transform.position.y + howMuchToOpenDoor, interactuableGameObjects[0].transform.position.z);
-                            doOnce = true;
-                        }
-
+                        activateDoor = true;
+                        doOnce = true;
                         break;
                     case (ButtonActivate.DEFAULT):
                         Debug.Log("Forgot to put what does this button do");
@@ -178,6 +189,19 @@ public class Button : MonoBehaviour
                         break;
                 }
             }
+            else
+            {
+                float div = other.gameObject.GetComponent<Hungerin>().GetWeight() / minWeight;
+                buttonZone.transform.position = new Vector3(buttonZone.transform.position.x, buttonZone.transform.position.y - 0.045f * div, buttonZone.transform.position.z);
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Player" && !doOnce)
+        {
+            buttonZone.transform.position = originalPosButton;
         }
     }
 
