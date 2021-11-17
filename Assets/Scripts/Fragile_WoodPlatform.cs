@@ -6,6 +6,7 @@ public class Fragile_WoodPlatform : MonoBehaviour
 {
     [SerializeField] private float weightToBreak = 2.0f;
     [SerializeField] private GameObject[] nearPlatforms = null;
+    [SerializeField] private float minVelocityTobreak = -8.0f;
 
     public void DropPlatform()
     {
@@ -18,7 +19,7 @@ public class Fragile_WoodPlatform : MonoBehaviour
         if (other.gameObject.tag == "Player")
         {
             Debug.Log(other.gameObject.GetComponent<Rigidbody>().velocity.y);
-            if (other.gameObject.GetComponent<Hungerin>().GetWeight() >= weightToBreak && other.gameObject.GetComponent<Rigidbody>().velocity.y < 0.0f)
+            if (other.gameObject.GetComponent<Hungerin>().GetWeight() >= weightToBreak && other.gameObject.GetComponent<Rigidbody>().velocity.y < minVelocityTobreak)
             {
 
                 foreach(GameObject platform in nearPlatforms)

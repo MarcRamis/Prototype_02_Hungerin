@@ -26,10 +26,12 @@ public class GameController : MonoBehaviour
                 break;
             case (Objects.ObjType.LOG):
                 assetPrefab = Resources.Load<GameObject>("Prefabs/Log");
+                assetPrefab.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
                 Instantiate(assetPrefab, tempObj.objPos, tempObj.objRot, GameObject.Find("Eateable_Objects").transform);
                 break;
             case (Objects.ObjType.LOGSTACK):
                 assetPrefab = Resources.Load<GameObject>("Prefabs/Log_Stack");
+                assetPrefab.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
                 Instantiate(assetPrefab, tempObj.objPos, tempObj.objRot, GameObject.Find("Eateable_Objects").transform);
                 break;
             default:
