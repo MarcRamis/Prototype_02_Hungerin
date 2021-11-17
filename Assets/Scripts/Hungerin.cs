@@ -179,7 +179,7 @@ public class Hungerin : MonoBehaviour
     {
 
 
-        if (eatInputButton && !isGrappeling)
+        if (eatInputButton && !isGrappeling && !isCarryingUp)
         {
             Vector3 direction = m_Target.position - transform.position;
             Ray raycastTarget = new Ray(transform.position, direction.normalized);
@@ -202,14 +202,14 @@ public class Hungerin : MonoBehaviour
             }
             eatInputButton = false;
         }
-        else if (eatInputButton && isGrappeling && grabObj != null)
+        else if (eatInputButton && isGrappeling && grabObj != null && !isCarryingUp)
         {
             GrappleLaunch(grabObj);
             isGrappeling = false;
             eatInputButton = false;
         }
 
-        if (isCarryingUp)
+        else if (isCarryingUp)
         {
             MoveGrappledObject();
         }
