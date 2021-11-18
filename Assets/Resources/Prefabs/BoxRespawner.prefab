@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7803121600455023000}
   - component: {fileID: 7310772590428788864}
   - component: {fileID: 8968382848755660191}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: BoxRespawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
