@@ -71,11 +71,13 @@ public class Hungerin : MonoBehaviour
     [SerializeField] private float collapseAttackRadius = 10f;
     private bool canDoubleJump = false;
     public bool isCollapsing { get; set; }
+    public bool infiniteHealth { get; set; }
     
     private void Awake()
     {
         m_RigidBody.mass = m_EssencialProperties.weight;
         initialScale = transform.localScale;
+        infiniteHealth = false;
     }
 
     private void Start()
@@ -108,8 +110,8 @@ public class Hungerin : MonoBehaviour
     // Here we make physics
     private void FixedUpdate()
     {
-        if (m_EssencialProperties.largeSize <= 0) { Debug.Log(name + " died"); }
-
+        if (m_EssencialProperties.largeSize <= 0 && !infiniteHealth) { Debug.Log(name + " died"); }
+        else if(m_EssencialProperties.largeSize <= 0 && infiniteHealth) { m_EssencialProperties.largeSize = minSize; }
         switch(m_TypeTransformation)
         {
             case TypeTransformation.NORMAL:
@@ -432,7 +434,15 @@ public class Hungerin : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        m_EssencialProperties.largeSize -= damage;
+        if(!infiniteHealth)
+        {
+            m_EssencialProperties.largeSize -= damage;
+        }
+        else if(m_EssencialProperties.largeSize - damage < minSize)
+        {
+            m_EssencialProperties.largeSize = minSize;
+        }
+        
     }
 
     IEnumerator DisableTongue()
@@ -452,7 +462,21 @@ public class Hungerin : MonoBehaviour
         isCollapsing = false;
     }
 
-
+    public void ResetMassPlayer()
+    {
+        SetNewMass(1.0f);
+        transform.localScale =
+                    new Vector3(
+                        minSize,
+                        minSize,
+                        minSize);
+        while(eatenGameObjects.Count != 0)
+        {
+            GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
+            eatenGameObjects.Pop();
+        }
+        
+    }
     
     public float GetWeight() { return m_EssencialProperties.weight; }
 

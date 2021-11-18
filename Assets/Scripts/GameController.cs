@@ -5,6 +5,17 @@ using UnityEngine;
 public class GameController : MonoBehaviour
 {
     private Stack<SceneObjects> objEaten = new Stack<SceneObjects>();
+
+    //Inputs bools
+    private bool inputInfiniteHealth = false;
+    private bool inputResetMass = false;
+    private bool inputLastLevel = false;
+    private bool inputNextLevel = false;
+
+    //Spawns that are in the Scene
+    [SerializeField] private GameObject[] spawns = null;
+    private int spawnToGo = 0; //Which spawn to teleport
+
     public void ObjectEaten(Vector3 _pos, Quaternion _rot, Objects.ObjType _type)
     {
         SceneObjects tempObj;
@@ -14,6 +25,11 @@ public class GameController : MonoBehaviour
         objEaten.Push(tempObj);
     }
 
+    private void Update()
+    {
+        GetCheatInputs();
+        ControlCheats();
+    }
     public void ReSpawnObj()
     {
         GameObject assetPrefab = null;
@@ -41,6 +57,95 @@ public class GameController : MonoBehaviour
         objEaten.Pop();
     }
 
+    private void GetCheatInputs()
+    {
+        if(Input.GetKeyDown(KeyCode.F1))
+        {
+            inputInfiniteHealth = true;
+        }
+
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            inputResetMass = true;
+        }
+
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            inputLastLevel = true;
+        }
+
+        if (Input.GetKeyDown(KeyCode.F6))
+        {
+            inputNextLevel = true;
+        }
+    }
+    private void ControlCheats()
+    {
+        if(inputInfiniteHealth)
+        {
+            SetPlayerInfiniteHealth();
+            inputInfiniteHealth = false;
+        }
+
+        if(inputResetMass)
+        {
+            ResetPlayerMass();
+            inputResetMass = false;
+        }
+
+        if(inputLastLevel)
+        {
+            LastSpawn();
+            inputLastLevel = false;
+        }
+
+        if(inputNextLevel)
+        {
+            NextSpawn();
+            inputNextLevel = false;
+        }
+    }
+    private void SetPlayerInfiniteHealth()
+    {
+        if (GameObject.FindGameObjectWithTag("Player").GetComponent<Hungerin>().infiniteHealth)
+        {
+            GameObject.FindGameObjectWithTag("Player").GetComponent<Hungerin>().infiniteHealth = false;
+        }
+        else
+        {
+            GameObject.FindGameObjectWithTag("Player").GetComponent<Hungerin>().infiniteHealth = true;
+        }
+    }
+    private void ResetPlayerMass()
+    {
+        GameObject.FindGameObjectWithTag("Player").GetComponent<Hungerin>().ResetMassPlayer();
+    }
+    private void LastSpawn()
+    {
+        spawnToGo--;
+        if (spawnToGo <= -1)
+        {
+            spawnToGo = spawns.Length - 1;
+            GameObject.FindGameObjectWithTag("Player").transform.position = spawns[spawnToGo].transform.position;
+        }
+        else
+        {
+            GameObject.FindGameObjectWithTag("Player").transform.position = spawns[spawnToGo].transform.position;
+        }
+    }
+    private void NextSpawn()
+    {
+        spawnToGo++;
+        if (spawnToGo >= spawns.Length)
+        {
+            spawnToGo = 0;
+            GameObject.FindGameObjectWithTag("Player").transform.position = spawns[spawnToGo].transform.position;
+        }
+        else
+        {
+            GameObject.FindGameObjectWithTag("Player").transform.position = spawns[spawnToGo].transform.position;
+        }
+    }
 }
 struct SceneObjects
 {
