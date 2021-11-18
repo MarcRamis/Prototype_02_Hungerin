@@ -57,6 +57,7 @@ public class Objects : MonoBehaviour
     public ObjType GetObjItIs() { return objectItIs; }
     public void MoveToPlayer(Vector3 target)
     {
+        gameObject.layer = LayerMask.NameToLayer("IgnoreColls");
         Vector3 direction = target - transform.position;
         direction = direction.normalized;
 
