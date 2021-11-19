@@ -62,8 +62,7 @@ public class Hungerin : MonoBehaviour
     [Header("Spit physics")]
     [SerializeField] Transform m_SpitSpawn;
     [SerializeField] GameObject bulletPrefab;
-    [SerializeField] GameObject bulletFirePrefab;
-    [SerializeField] private float bulletSpeed = 20f;
+    [SerializeField] private float bulletSpeed = 15f;
     private bool spitInputButton = false;
 
     [Space]
@@ -77,11 +76,17 @@ public class Hungerin : MonoBehaviour
     
     [Space]
     [Header("Collapse Transformation physics")]
+    [SerializeField] private float collapseAttackRadius = 3f;
     private TypeTransformation m_TypeTransformation = TypeTransformation.NORMAL;
-    [SerializeField] private float collapseAttackRadius = 10f;
     private bool canDoubleJump = false;
     public bool isCollapsing { get; set; }
-    
+
+    [Space]
+    [Header("Chile Transformation physics")]
+
+    [SerializeField] GameObject bulletFirePrefab;
+    [SerializeField] private float bulletFireSpeed = 20f;
+
     private void Awake()
     {
         m_RigidBody.mass = m_EssencialProperties.weight;
@@ -347,7 +352,7 @@ public class Hungerin : MonoBehaviour
 
                 // Spit force
                 Vector3 direction = m_Target.position - m_SpitSpawn.position;
-                bulletRb.AddForce(direction.normalized * bulletSpeed, ForceMode.Impulse);
+                bulletRb.AddForce(direction.normalized * bulletFireSpeed, ForceMode.Impulse);
 
                 //Eliminate stored object from the stack and store the values
                 EssencialProperties objToSpit;
