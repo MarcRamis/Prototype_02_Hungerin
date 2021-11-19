@@ -17,8 +17,7 @@ TagManager:
   - Door
   - 
   - Enemy
-  - 
-  - 
+  - IgnoreColls
   - 
   - 
   - 
