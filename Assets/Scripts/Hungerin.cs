@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Hungerin : MonoBehaviour
 {
-    private enum TypeTransformation { NORMAL, COLLAPSE }
+    private enum TypeTransformation { NORMAL, COLLAPSE, CHILE }
 
     [SerializeField] private Rigidbody m_RigidBody;
     [SerializeField] private Transform m_Target;
@@ -124,6 +124,9 @@ public class Hungerin : MonoBehaviour
             case TypeTransformation.COLLAPSE:
                 CollapseMovement();
                 break;
+            case TypeTransformation.CHILE:
+                NormalMovement();
+                break;
             default:
                 Debug.Log("Error type transformation");
                 break;
@@ -198,6 +201,12 @@ public class Hungerin : MonoBehaviour
                     {
                         EatPowerUp(hit);
                         m_TypeTransformation = TypeTransformation.COLLAPSE;
+                        ChangeFormTransformation();
+                    }
+                    else if(hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.POWERUP_CHILE)
+                    {
+                        EatPowerUp(hit);
+                        m_TypeTransformation = TypeTransformation.CHILE;
                         ChangeFormTransformation();
                     }
 
@@ -482,6 +491,10 @@ public class Hungerin : MonoBehaviour
             case TypeTransformation.COLLAPSE:
                 m_Material.color = NewColor(183, 39, 177, 255);
                 gravityScale = 10;
+                break;
+            case TypeTransformation.CHILE:
+                m_Material.color = NewColor(236, 89, 0, 255);
+                gravityScale = 15;
                 break;
             default:
                 Debug.Log("Error type transformation");
