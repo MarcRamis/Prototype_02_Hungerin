@@ -290,7 +290,7 @@ public class Hungerin : MonoBehaviour
     {
         if (spitInputButton)
         {
-            if(transform.localScale.x > minSize)
+            if(transform.localScale.x > minSize && eatenGameObjects.Count > 0)
             {
                 
                 // Spit
@@ -303,15 +303,15 @@ public class Hungerin : MonoBehaviour
 
                 //Eliminate stored object from the stack and store the values
                 EssencialProperties objToSpit;
-                if (eatenGameObjects.Count == 0)
-                {
-                    SumSize(-2.0f);
-                    MinScalarSize(-1.0f);
-                    SumWeight(-1.0f);
-                    SetNewMass(m_EssencialProperties.weight);
+                //if (eatenGameObjects.Count == 0)
+                //{
+                //    SumSize(-2.0f);
+                //    MinScalarSize(-1.0f);
+                //    SumWeight(-1.0f);
+                //    SetNewMass(m_EssencialProperties.weight);
                     
-                }
-                else
+                //}
+                //else
                 {
                     objToSpit = eatenGameObjects.Peek();
                     eatenGameObjects.Pop();
@@ -538,6 +538,8 @@ public class Hungerin : MonoBehaviour
 
     public void ResetMassPlayer()
     {
+        m_EssencialProperties.weight = minWeight;
+        m_EssencialProperties.largeSize = minLargeSize;
         SetNewMass(1.0f);
         transform.localScale =
                     new Vector3(

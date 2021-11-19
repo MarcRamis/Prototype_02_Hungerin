@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8259454862576341051}
   - component: {fileID: 808883831}
   - component: {fileID: -520278129358715857}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Log_Stack
   m_TagString: CanBeEaten
   m_Icon: {fileID: 0}
@@ -101,6 +101,7 @@ MonoBehaviour:
     largeSize: 100
     weight: 100
   typeObj: 2
+  itype: 0
   objectItIs: 2
 --- !u!65 &808883831
 BoxCollider:

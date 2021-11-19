@@ -463,15 +463,14 @@ MonoBehaviour:
   launchDirectionAgainstMassForce: 2000
   launchUpDirectionAgainstMassForce: 1000
   minWeight: 1
-  minLargeSize: 0
-  eatenMask:
-    serializedVersion: 2
-    m_Bits: 256
+  minLargeSize: 1
   m_SpitSpawn: {fileID: 1857337520}
   bulletPrefab: {fileID: 1928512621476752723, guid: b0d49576a4e47e040a06ccae2a016676, type: 3}
   bulletSpeed: 15
   m_TypeTransformation: 0
   collapseAttackRadius: 3
+  grappledObjectWhenMovingRadius: 0.5
+  grappledObjectLaunchSpeed: 200
 --- !u!120 &511783492
 LineRenderer:
   m_ObjectHideFlags: 0

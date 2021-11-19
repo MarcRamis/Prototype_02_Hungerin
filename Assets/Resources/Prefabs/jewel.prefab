@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1205456852267783669}
   - component: {fileID: 6531501949776013148}
   - component: {fileID: -9000792197573793603}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: jewel
   m_TagString: CanBeEaten
   m_Icon: {fileID: 0}
@@ -100,6 +100,7 @@ MonoBehaviour:
     largeSize: 1
     weight: 1
   typeObj: 0
+  itype: 0
   objectItIs: 0
 --- !u!65 &6531501949776013148
 BoxCollider:

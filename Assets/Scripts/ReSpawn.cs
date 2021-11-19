@@ -34,6 +34,10 @@ public class ReSpawn : MonoBehaviour
                     assetPrefab.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
                     Instantiate(assetPrefab, tempPos, tempRot, GameObject.Find("Eateable_Objects").transform);
                     break;
+                case (Objects.ObjType.CRATE):
+                    assetPrefab = Resources.Load<GameObject>("Prefabs/Crate");
+                    Instantiate(assetPrefab, tempPos, tempRot, GameObject.Find("NotEateable").transform);
+                    break;
                 default:
                     Debug.Log("Couldn't find gameObject to Respawn");
                     break;

@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 4775802651459389133}
   m_Layer: 8
   m_Name: Crate
-  m_TagString: Untagged
+  m_TagString: CanBeEaten
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -102,6 +102,7 @@ MonoBehaviour:
     weight: 1
   typeObj: 0
   itype: 1
+  objectItIs: 3
 --- !u!54 &919132148719032396
 Rigidbody:
   m_ObjectHideFlags: 0
