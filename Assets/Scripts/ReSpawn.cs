@@ -12,6 +12,34 @@ public class ReSpawn : MonoBehaviour
         {
             other.transform.position = reSpawn.transform.position;
         }
+        else if(other.gameObject.tag == "CanBeEaten")
+        {
+            GameObject assetPrefab = null;
+            Vector3 tempPos = other.gameObject.GetComponent<Objects>().originalPos;
+            Quaternion tempRot = other.gameObject.GetComponent<Objects>().originalRot;
+            Objects.ObjType tempType = other.gameObject.GetComponent<Objects>().GetObjItIs();
+            switch (tempType)
+            {
+                case (Objects.ObjType.JEWEL):
+                    assetPrefab = Resources.Load<GameObject>("Prefabs/jewel");
+                    Instantiate(assetPrefab, tempPos, tempRot, GameObject.Find("Eateable_Objects").transform);
+                    break;
+                case (Objects.ObjType.LOG):
+                    assetPrefab = Resources.Load<GameObject>("Prefabs/Log");
+                    assetPrefab.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                    Instantiate(assetPrefab, tempPos, tempRot, GameObject.Find("Eateable_Objects").transform);
+                    break;
+                case (Objects.ObjType.LOGSTACK):
+                    assetPrefab = Resources.Load<GameObject>("Prefabs/Log_Stack");
+                    assetPrefab.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                    Instantiate(assetPrefab, tempPos, tempRot, GameObject.Find("Eateable_Objects").transform);
+                    break;
+                default:
+                    Debug.Log("Couldn't find gameObject to Respawn");
+                    break;
+            }
+            Destroy(other.gameObject);
+        }
     }
 
     public void SetNewSpawn(GameObject _spawn)

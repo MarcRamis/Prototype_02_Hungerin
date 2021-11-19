@@ -17,8 +17,7 @@ TagManager:
   - Door
   - EatenItem
   - Enemy
-  - 
-  - 
+  - IgnoreColls
   - 
   - 
   - 

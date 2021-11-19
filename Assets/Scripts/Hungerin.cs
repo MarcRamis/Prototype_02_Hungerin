@@ -79,11 +79,13 @@ public class Hungerin : MonoBehaviour
     private GameObject grabObj;
     [SerializeField] private float grappledObjectWhenMovingRadius = 0.5f;
     [SerializeField] private float grappledObjectLaunchSpeed = 200f;
+    public bool infiniteHealth { get; set; }
     
     private void Awake()
     {
         m_RigidBody.mass = m_EssencialProperties.weight;
         initialScale = transform.localScale;
+        infiniteHealth = false;
     }
 
     private void Start()
@@ -116,8 +118,8 @@ public class Hungerin : MonoBehaviour
     // Here we make physics
     private void FixedUpdate()
     {
-        if (m_EssencialProperties.largeSize <= 0) { Debug.Log(name + " died"); }
-
+        if (m_EssencialProperties.largeSize <= 0 && !infiniteHealth) { Debug.Log(name + " died"); }
+        else if(m_EssencialProperties.largeSize <= 0 && infiniteHealth) { m_EssencialProperties.largeSize = minSize; }
         switch(m_TypeTransformation)
         {
             case TypeTransformation.NORMAL:
@@ -226,6 +228,8 @@ public class Hungerin : MonoBehaviour
             tempProperties.largeSize = hit.transform.gameObject.GetComponent<Objects>().GetSumSize();
             tempProperties.weight = hit.transform.gameObject.GetComponent<Objects>().GetSumWeight();
             eatenGameObjects.Push(tempProperties);
+            //GameController stores the objects that are missing in the scene
+            GameObject.Find("GameController").GetComponent<GameController>().ObjectEaten(hit.collider.gameObject.GetComponent<Objects>().originalPos, hit.collider.gameObject.GetComponent<Objects>().originalRot, hit.collider.gameObject.GetComponent<Objects>().GetObjItIs());
 
             hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
 
@@ -311,6 +315,7 @@ public class Hungerin : MonoBehaviour
                 {
                     objToSpit = eatenGameObjects.Peek();
                     eatenGameObjects.Pop();
+                    GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
                     SumSize(-objToSpit.largeSize);
                     MinScalarSize(-objToSpit.largeSize);
                     SumWeight(-objToSpit.weight);
@@ -479,11 +484,11 @@ public class Hungerin : MonoBehaviour
         {
             case TypeTransformation.NORMAL:
                 m_Material.color = NewColor(47,39,183,255);
-                gravityScale = 10;
+                gravityScale = 15;
                 break;
             case TypeTransformation.COLLAPSE:
                 m_Material.color = NewColor(183, 39, 177, 255);
-                gravityScale = 5;
+                gravityScale = 10;
                 break;
             default:
                 Debug.Log("Error type transformation");
@@ -503,7 +508,15 @@ public class Hungerin : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        m_EssencialProperties.largeSize -= damage;
+        if(!infiniteHealth)
+        {
+            m_EssencialProperties.largeSize -= damage;
+        }
+        else if(m_EssencialProperties.largeSize - damage < minSize)
+        {
+            m_EssencialProperties.largeSize = minSize;
+        }
+        
     }
 
     IEnumerator DisableTongue()
@@ -523,6 +536,22 @@ public class Hungerin : MonoBehaviour
         isCollapsing = false;
     }
 
+    public void ResetMassPlayer()
+    {
+        SetNewMass(1.0f);
+        transform.localScale =
+                    new Vector3(
+                        minSize,
+                        minSize,
+                        minSize);
+        while(eatenGameObjects.Count != 0)
+        {
+            GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
+            eatenGameObjects.Pop();
+        }
+        
+    }
+    
     public float GetWeight() { return m_EssencialProperties.weight; }
 
     private void OnDrawGizmos()

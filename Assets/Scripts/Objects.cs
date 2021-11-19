@@ -6,22 +6,30 @@ public class Objects : MonoBehaviour
 {
     public enum ItemType { EATEN, GRIPPY, POWERUP_COLLAPSE };
     private enum SizeType { SMALL, MEDIUM, BIG, DEFAULT };
+    public enum ObjType {  JEWEL, LOG, LOGSTACK, DEFAULT };
     private Rigidbody m_Rigidbody;
     [SerializeField] private EssencialProperties m_essencialProperties;
     [SerializeField] private SizeType typeObj = SizeType.DEFAULT;
     [SerializeField] private ItemType itype = ItemType.EATEN;
+    [SerializeField] private ObjType objectItIs = ObjType.DEFAULT;
     private float sumSize = 0.0f;
     private float sumWeight = 0.0f;
     private float speedToTarget = 800f;
 
     public bool isBeingLaunched { get; set; }
 
+    public Vector3 originalPos { get; set; }
+    public Quaternion originalRot { get; set; }
+
     private void Awake()
     {
         m_Rigidbody = gameObject.GetComponent<Rigidbody>();
         m_essencialProperties.weight = 1;
         m_Rigidbody.mass = m_essencialProperties.weight;
-        switch(typeObj)
+        originalPos = transform.position;
+        originalRot = transform.localRotation;
+
+        switch (typeObj)
         {
             case (SizeType.SMALL):
                 sumSize = 2;
@@ -52,8 +60,10 @@ public class Objects : MonoBehaviour
     public float GetSumSize() { return sumSize; }
 
     public ItemType GetEType() { return itype; }
+    public ObjType GetObjItIs() { return objectItIs; }
     public void MoveToPlayer(Vector3 target)
     {
+        gameObject.layer = LayerMask.NameToLayer("IgnoreColls");
         Vector3 direction = target - transform.position;
         direction = direction.normalized;
 
