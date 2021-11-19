@@ -105,10 +105,6 @@ public class Hungerin : MonoBehaviour
         {
             spitInputButton = true;
         }
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            ChangeFormTransformation();
-        }
         if(Input.GetButtonDown("Jump"))
         {
             spaceInputButton = true;
@@ -229,7 +225,10 @@ public class Hungerin : MonoBehaviour
             tempProperties.weight = hit.transform.gameObject.GetComponent<Objects>().GetSumWeight();
             eatenGameObjects.Push(tempProperties);
             //GameController stores the objects that are missing in the scene
-            GameObject.Find("GameController").GetComponent<GameController>().ObjectEaten(hit.collider.gameObject.GetComponent<Objects>().originalPos, hit.collider.gameObject.GetComponent<Objects>().originalRot, hit.collider.gameObject.GetComponent<Objects>().GetObjItIs());
+            //GameObject.Find("GameController").GetComponent<GameController>().ObjectEaten(
+            //    hit.collider.gameObject.GetComponent<Objects>().originalPos, 
+            //    hit.collider.gameObject.GetComponent<Objects>().originalRot, 
+            //    hit.collider.gameObject.GetComponent<Objects>().GetObjItIs());
 
             hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
 
@@ -303,26 +302,15 @@ public class Hungerin : MonoBehaviour
 
                 //Eliminate stored object from the stack and store the values
                 EssencialProperties objToSpit;
-                //if (eatenGameObjects.Count == 0)
-                //{
-                //    SumSize(-2.0f);
-                //    MinScalarSize(-1.0f);
-                //    SumWeight(-1.0f);
-                //    SetNewMass(m_EssencialProperties.weight);
-                    
-                //}
-                //else
-                {
-                    objToSpit = eatenGameObjects.Peek();
-                    eatenGameObjects.Pop();
-                    GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
-                    SumSize(-objToSpit.largeSize);
-                    MinScalarSize(-objToSpit.largeSize);
-                    SumWeight(-objToSpit.weight);
-                    SetNewMass(m_EssencialProperties.weight);
-                }
 
-                
+
+                objToSpit = eatenGameObjects.Peek();
+                eatenGameObjects.Pop();
+                //GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
+                SumSize(-objToSpit.largeSize);
+                MinScalarSize(-objToSpit.largeSize);
+                SumWeight(-objToSpit.weight);
+                SetNewMass(m_EssencialProperties.weight);
             }
 
             spitInputButton = false;
@@ -363,7 +351,7 @@ public class Hungerin : MonoBehaviour
                 m_RigidBody.velocity = direction * speed * Time.fixedDeltaTime;
             }
 
-            isCollapsing = false;
+            StartCoroutine("DisableIsCollapsing");
         }
         else
         {
@@ -376,9 +364,6 @@ public class Hungerin : MonoBehaviour
                     canDoubleJump = false;
                     spaceInputButton = false;
                     isCollapsing = true;
-                    // IF SPHERE COLLIDING WITH BROKEN BOX
-
-                    // IF = BUT ENEMIES
                 }
                 else
                 {
@@ -533,6 +518,11 @@ public class Hungerin : MonoBehaviour
     {
         yield return new WaitForSeconds(2f);
         canDoubleJump = false;
+        isCollapsing = false;
+    }
+    IEnumerator DisableIsCollapsing()
+    {
+        yield return new WaitForSeconds(0.2f);
         isCollapsing = false;
     }
 

@@ -40,6 +40,8 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float gravityScale = 10f;
     [SerializeField] private float globalGravity = -9.81f;
 
+    private bool canTakeCollapseDamage = true;
+
     private void Awake()
     {
         m_LineRenderer.enabled = false;
@@ -99,14 +101,22 @@ public class Enemy : MonoBehaviour
                     m_Rb.velocity = Seek(player.transform.position) * speed * Time.fixedDeltaTime;
                 }
             }
-
-            if (player.GetComponent<Hungerin>().isInsideCollapseRadius(transform.position)
-                && player.GetComponent<Hungerin>().isCollapsing)
+            if (player != null)
             {
-                // hacer un bool doOnce y un takedamage
-                Debug.Log("a");
-            }
+                if (player.GetComponent<Hungerin>().isInsideCollapseRadius(transform.position)
+                    && player.GetComponent<Hungerin>().isCollapsing)
+                {
+                    // hacer un bool doOnce y un takedamage
 
+                    if (canTakeCollapseDamage)
+                    {
+                        canTakeCollapseDamage = false;
+                        TakeDamage(80f);
+
+                        StartCoroutine("EnableCanTakeCollapseDamage");
+                    }
+                }
+            }
         }
         else
         {
@@ -186,6 +196,11 @@ public class Enemy : MonoBehaviour
         startAttack = true;
     }
 
+    IEnumerator EnableCanTakeCollapseDamage()
+    {
+        yield return new WaitForSeconds(1f);
+        canTakeCollapseDamage = true;
+    }
 
     private void OnDrawGizmos()
     {
