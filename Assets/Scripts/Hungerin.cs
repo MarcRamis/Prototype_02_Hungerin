@@ -62,6 +62,7 @@ public class Hungerin : MonoBehaviour
     [Header("Spit physics")]
     [SerializeField] Transform m_SpitSpawn;
     [SerializeField] GameObject bulletPrefab;
+    [SerializeField] GameObject bulletFirePrefab;
     [SerializeField] private float bulletSpeed = 20f;
     private bool spitInputButton = false;
 
@@ -120,12 +121,15 @@ public class Hungerin : MonoBehaviour
         {
             case TypeTransformation.NORMAL:
                 NormalMovement();
+                UseSpit();
                 break;
             case TypeTransformation.COLLAPSE:
                 CollapseMovement();
+                UseSpit();
                 break;
             case TypeTransformation.CHILE:
                 NormalMovement();
+                UseSpitChile();
                 break;
             default:
                 Debug.Log("Error type transformation");
@@ -133,7 +137,6 @@ public class Hungerin : MonoBehaviour
         }
  
         UseTongue();
-        UseSpit();
     }
 
     private void NormalMovement()
@@ -320,7 +323,6 @@ public class Hungerin : MonoBehaviour
                 //Eliminate stored object from the stack and store the values
                 EssencialProperties objToSpit;
 
-
                 objToSpit = eatenGameObjects.Peek();
                 eatenGameObjects.Pop();
                 //GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
@@ -333,6 +335,46 @@ public class Hungerin : MonoBehaviour
             spitInputButton = false;
         }
     }
+    private void UseSpitChile()
+    {
+        if (spitInputButton)
+        {
+            if (transform.localScale.x > minSize && eatenGameObjects.Count > 0)
+            {
+                // Spit
+                GameObject bullet = Instantiate(bulletFirePrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
+                Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+
+                // Spit force
+                Vector3 direction = m_Target.position - m_SpitSpawn.position;
+                bulletRb.AddForce(direction.normalized * bulletSpeed, ForceMode.Impulse);
+
+                //Eliminate stored object from the stack and store the values
+                EssencialProperties objToSpit;
+
+                objToSpit = eatenGameObjects.Peek();
+                eatenGameObjects.Pop();
+                //GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
+                SumSize(-objToSpit.largeSize);
+                MinScalarSize(-objToSpit.largeSize);
+                SumWeight(-objToSpit.weight);
+                SetNewMass(m_EssencialProperties.weight);
+            }
+            else
+            {
+                // Spit
+                GameObject bullet = Instantiate(bulletFirePrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
+                Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+
+                // Spit force
+                Vector3 direction = m_Target.position - m_SpitSpawn.position;
+                bulletRb.AddForce(direction.normalized * bulletSpeed, ForceMode.Impulse);
+            }
+
+            spitInputButton = false;
+        }
+    }
+
     private void CollapseMovement()
     {
         // Inputs movement
