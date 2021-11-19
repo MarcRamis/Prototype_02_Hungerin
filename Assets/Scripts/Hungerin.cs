@@ -66,13 +66,6 @@ public class Hungerin : MonoBehaviour
     private bool spitInputButton = false;
 
     [Space]
-    [Header("Collapse Transformation physics")]
-    [SerializeField] private TypeTransformation m_TypeTransformation = TypeTransformation.NORMAL;
-    [SerializeField] private float collapseAttackRadius = 10f;
-    private bool canDoubleJump = false;
-    public bool isCollapsing { get; set; }
-
-    [Space]
     [Header("Tongue attack physics")]
     private bool isGrappeling = false;
     private bool isCarryingUp = false;
@@ -80,6 +73,13 @@ public class Hungerin : MonoBehaviour
     [SerializeField] private float grappledObjectWhenMovingRadius = 0.5f;
     [SerializeField] private float grappledObjectLaunchSpeed = 200f;
     public bool infiniteHealth { get; set; }
+    
+    [Space]
+    [Header("Collapse Transformation physics")]
+    private TypeTransformation m_TypeTransformation = TypeTransformation.NORMAL;
+    [SerializeField] private float collapseAttackRadius = 10f;
+    private bool canDoubleJump = false;
+    public bool isCollapsing { get; set; }
     
     private void Awake()
     {
@@ -175,8 +175,6 @@ public class Hungerin : MonoBehaviour
     }
     private void UseTongue()
     {
-
-
         if (eatInputButton && !isGrappeling && !isCarryingUp)
         {
             Vector3 direction = m_Target.position - transform.position;
@@ -196,6 +194,13 @@ public class Hungerin : MonoBehaviour
                     {
                         Grapple(hit);
                     }
+                    else if (hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.POWERUP_COLLAPSE)
+                    {
+                        EatPowerUp(hit);
+                        m_TypeTransformation = TypeTransformation.COLLAPSE;
+                        ChangeFormTransformation();
+                    }
+
                 }
             }
             eatInputButton = false;
@@ -244,6 +249,10 @@ public class Hungerin : MonoBehaviour
             StartCoroutine("PlayerIsForced");
         }
     }
+    private void EatPowerUp(RaycastHit hit)
+    {
+        hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
+    }
     private void Grapple(RaycastHit hit)
     {
         // Hit represents with raycast has collided
@@ -291,7 +300,6 @@ public class Hungerin : MonoBehaviour
         {
             if(transform.localScale.x > minSize && eatenGameObjects.Count > 0)
             {
-                
                 // Spit
                 GameObject bullet = Instantiate(bulletPrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
                 Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
