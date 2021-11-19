@@ -374,7 +374,6 @@ public class Hungerin : MonoBehaviour
             spitInputButton = false;
         }
     }
-
     private void CollapseMovement()
     {
         // Inputs movement
@@ -440,6 +439,7 @@ public class Hungerin : MonoBehaviour
             spaceInputButton = false;   // This is because if you press space input button again in air it makes another jump without pressing at that moment
         }
     }
+    
     private void MaxScalarSize(float _largeSize)
     {
         if (transform.localScale.x <= maxSize)
@@ -507,6 +507,7 @@ public class Hungerin : MonoBehaviour
     {
         m_RigidBody.mass = weightEaten;
     }
+   
     private void LaunchToDirection(Vector3 target)
     {
         Vector3 direction = target - transform.position;
@@ -514,6 +515,7 @@ public class Hungerin : MonoBehaviour
         
         m_RigidBody.AddForce(direction * launchDirectionAgainstMassForce + Vector3.up * launchUpDirectionAgainstMassForce, ForceMode.Acceleration);
     }
+    
     private void DrawLineRenderer(Vector3 start, Vector3 end)
     {
         m_LineRenderer.enabled = true;
@@ -547,13 +549,11 @@ public class Hungerin : MonoBehaviour
     {
         return new Color(r/255, g/255, b/255, a/255);
     }
-
     public bool isInsideCollapseRadius(Vector3 target)
     {
         float distanceAToB = Vector3.Distance(transform.position, target);
         return distanceAToB <= collapseAttackRadius;
     }
-
     public void TakeDamage(float damage)
     {
         if(!infiniteHealth)
@@ -566,7 +566,7 @@ public class Hungerin : MonoBehaviour
         }
         
     }
-
+   
     IEnumerator DisableTongue()
     {
         yield return new WaitForSeconds(1f);
@@ -606,7 +606,6 @@ public class Hungerin : MonoBehaviour
         }
         
     }
-    
     public float GetWeight() { return m_EssencialProperties.weight; }
 
     private void OnDrawGizmos()
