@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Hungerin : MonoBehaviour
 {
-    private enum TypeTransformation { NORMAL, COLLAPSE }
+    private enum TypeTransformation { NORMAL, COLLAPSE, CHILE }
 
     [SerializeField] private Rigidbody m_RigidBody;
     [SerializeField] private Transform m_Target;
@@ -62,7 +62,7 @@ public class Hungerin : MonoBehaviour
     [Header("Spit physics")]
     [SerializeField] Transform m_SpitSpawn;
     [SerializeField] GameObject bulletPrefab;
-    [SerializeField] private float bulletSpeed = 20f;
+    [SerializeField] private float bulletSpeed = 15f;
     private bool spitInputButton = false;
 
     [Space]
@@ -76,11 +76,17 @@ public class Hungerin : MonoBehaviour
     
     [Space]
     [Header("Collapse Transformation physics")]
+    [SerializeField] private float collapseAttackRadius = 3f;
     private TypeTransformation m_TypeTransformation = TypeTransformation.NORMAL;
-    [SerializeField] private float collapseAttackRadius = 10f;
     private bool canDoubleJump = false;
     public bool isCollapsing { get; set; }
-    
+
+    [Space]
+    [Header("Chile Transformation physics")]
+
+    [SerializeField] GameObject bulletFirePrefab;
+    [SerializeField] private float bulletFireSpeed = 20f;
+
     private void Awake()
     {
         m_RigidBody.mass = m_EssencialProperties.weight;
@@ -120,9 +126,15 @@ public class Hungerin : MonoBehaviour
         {
             case TypeTransformation.NORMAL:
                 NormalMovement();
+                UseSpit();
                 break;
             case TypeTransformation.COLLAPSE:
                 CollapseMovement();
+                UseSpit();
+                break;
+            case TypeTransformation.CHILE:
+                NormalMovement();
+                UseSpitChile();
                 break;
             default:
                 Debug.Log("Error type transformation");
@@ -130,7 +142,6 @@ public class Hungerin : MonoBehaviour
         }
  
         UseTongue();
-        UseSpit();
     }
 
     private void NormalMovement()
@@ -198,6 +209,12 @@ public class Hungerin : MonoBehaviour
                     {
                         EatPowerUp(hit);
                         m_TypeTransformation = TypeTransformation.COLLAPSE;
+                        ChangeFormTransformation();
+                    }
+                    else if(hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.POWERUP_CHILE)
+                    {
+                        EatPowerUp(hit);
+                        m_TypeTransformation = TypeTransformation.CHILE;
                         ChangeFormTransformation();
                     }
 
@@ -311,6 +328,34 @@ public class Hungerin : MonoBehaviour
                 //Eliminate stored object from the stack and store the values
                 EssencialProperties objToSpit;
 
+                objToSpit = eatenGameObjects.Peek();
+                eatenGameObjects.Pop();
+                //GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
+                SumSize(-objToSpit.largeSize);
+                MinScalarSize(-objToSpit.largeSize);
+                SumWeight(-objToSpit.weight);
+                SetNewMass(m_EssencialProperties.weight);
+            }
+
+            spitInputButton = false;
+        }
+    }
+    private void UseSpitChile()
+    {
+        if (spitInputButton)
+        {
+            if (transform.localScale.x > minSize && eatenGameObjects.Count > 0)
+            {
+                // Spit
+                GameObject bullet = Instantiate(bulletFirePrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
+                Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+
+                // Spit force
+                Vector3 direction = m_Target.position - m_SpitSpawn.position;
+                bulletRb.AddForce(direction.normalized * bulletFireSpeed, ForceMode.Impulse);
+
+                //Eliminate stored object from the stack and store the values
+                EssencialProperties objToSpit;
 
                 objToSpit = eatenGameObjects.Peek();
                 eatenGameObjects.Pop();
@@ -319,6 +364,16 @@ public class Hungerin : MonoBehaviour
                 MinScalarSize(-objToSpit.largeSize);
                 SumWeight(-objToSpit.weight);
                 SetNewMass(m_EssencialProperties.weight);
+            }
+            else
+            {
+                // Spit
+                GameObject bullet = Instantiate(bulletFirePrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
+                Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+
+                // Spit force
+                Vector3 direction = m_Target.position - m_SpitSpawn.position;
+                bulletRb.AddForce(direction.normalized * bulletSpeed, ForceMode.Impulse);
             }
 
             spitInputButton = false;
@@ -389,6 +444,7 @@ public class Hungerin : MonoBehaviour
             spaceInputButton = false;   // This is because if you press space input button again in air it makes another jump without pressing at that moment
         }
     }
+    
     private void MaxScalarSize(float _largeSize)
     {
         if (transform.localScale.x <= maxSize)
@@ -456,6 +512,7 @@ public class Hungerin : MonoBehaviour
     {
         m_RigidBody.mass = weightEaten;
     }
+   
     private void LaunchToDirection(Vector3 target)
     {
         Vector3 direction = target - transform.position;
@@ -463,6 +520,7 @@ public class Hungerin : MonoBehaviour
         
         m_RigidBody.AddForce(direction * launchDirectionAgainstMassForce + Vector3.up * launchUpDirectionAgainstMassForce, ForceMode.Acceleration);
     }
+    
     private void DrawLineRenderer(Vector3 start, Vector3 end)
     {
         m_LineRenderer.enabled = true;
@@ -483,6 +541,10 @@ public class Hungerin : MonoBehaviour
                 m_Material.color = NewColor(183, 39, 177, 255);
                 gravityScale = 10;
                 break;
+            case TypeTransformation.CHILE:
+                m_Material.color = NewColor(236, 89, 0, 255);
+                gravityScale = 15;
+                break;
             default:
                 Debug.Log("Error type transformation");
                 break;
@@ -492,13 +554,11 @@ public class Hungerin : MonoBehaviour
     {
         return new Color(r/255, g/255, b/255, a/255);
     }
-
     public bool isInsideCollapseRadius(Vector3 target)
     {
         float distanceAToB = Vector3.Distance(transform.position, target);
         return distanceAToB <= collapseAttackRadius;
     }
-
     public void TakeDamage(float damage)
     {
         if(!infiniteHealth)
@@ -511,7 +571,7 @@ public class Hungerin : MonoBehaviour
         }
         
     }
-
+   
     IEnumerator DisableTongue()
     {
         yield return new WaitForSeconds(1f);
@@ -551,7 +611,6 @@ public class Hungerin : MonoBehaviour
         }
         
     }
-    
     public float GetWeight() { return m_EssencialProperties.weight; }
 
     private void OnDrawGizmos()

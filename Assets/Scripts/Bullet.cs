@@ -17,7 +17,7 @@ public class Bullet : MonoBehaviour
         {
             if (collision.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
             {
-                collision.collider.gameObject.GetComponent<Enemy>().TakeDamage(50f);
+                collision.collider.gameObject.GetComponent<Enemy>().TakeDamage(20f);
                 collision.collider.gameObject.GetComponent<Enemy>().isForcedToSeek = true;
             }
 

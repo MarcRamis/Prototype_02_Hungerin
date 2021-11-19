@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Objects : MonoBehaviour
 {
-    public enum ItemType { EATEN, GRIPPY, POWERUP_COLLAPSE };
+    public enum ItemType { EATEN, GRIPPY, POWERUP_COLLAPSE, POWERUP_CHILE };
     private enum SizeType { SMALL, MEDIUM, BIG, DEFAULT };
     public enum ObjType {  JEWEL, LOG, LOGSTACK, CRATE, DEFAULT };
     private Rigidbody m_Rigidbody;
