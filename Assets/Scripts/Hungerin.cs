@@ -66,13 +66,6 @@ public class Hungerin : MonoBehaviour
     private bool spitInputButton = false;
 
     [Space]
-    [Header("Collapse Transformation physics")]
-    [SerializeField] private TypeTransformation m_TypeTransformation = TypeTransformation.NORMAL;
-    [SerializeField] private float collapseAttackRadius = 10f;
-    private bool canDoubleJump = false;
-    public bool isCollapsing { get; set; }
-
-    [Space]
     [Header("Tongue attack physics")]
     private bool isGrappeling = false;
     private bool isCarryingUp = false;
@@ -80,6 +73,13 @@ public class Hungerin : MonoBehaviour
     [SerializeField] private float grappledObjectWhenMovingRadius = 0.5f;
     [SerializeField] private float grappledObjectLaunchSpeed = 200f;
     public bool infiniteHealth { get; set; }
+    
+    [Space]
+    [Header("Collapse Transformation physics")]
+    private TypeTransformation m_TypeTransformation = TypeTransformation.NORMAL;
+    [SerializeField] private float collapseAttackRadius = 10f;
+    private bool canDoubleJump = false;
+    public bool isCollapsing { get; set; }
     
     private void Awake()
     {
@@ -104,10 +104,6 @@ public class Hungerin : MonoBehaviour
         if (Input.GetButtonDown("Spit"))
         {
             spitInputButton = true;
-        }
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            ChangeFormTransformation();
         }
         if(Input.GetButtonDown("Jump"))
         {
@@ -179,8 +175,6 @@ public class Hungerin : MonoBehaviour
     }
     private void UseTongue()
     {
-
-
         if (eatInputButton && !isGrappeling && !isCarryingUp)
         {
             Vector3 direction = m_Target.position - transform.position;
@@ -200,6 +194,13 @@ public class Hungerin : MonoBehaviour
                     {
                         Grapple(hit);
                     }
+                    else if (hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.POWERUP_COLLAPSE)
+                    {
+                        EatPowerUp(hit);
+                        m_TypeTransformation = TypeTransformation.COLLAPSE;
+                        ChangeFormTransformation();
+                    }
+
                 }
             }
             eatInputButton = false;
@@ -229,7 +230,10 @@ public class Hungerin : MonoBehaviour
             tempProperties.weight = hit.transform.gameObject.GetComponent<Objects>().GetSumWeight();
             eatenGameObjects.Push(tempProperties);
             //GameController stores the objects that are missing in the scene
-            GameObject.Find("GameController").GetComponent<GameController>().ObjectEaten(hit.collider.gameObject.GetComponent<Objects>().originalPos, hit.collider.gameObject.GetComponent<Objects>().originalRot, hit.collider.gameObject.GetComponent<Objects>().GetObjItIs());
+            //GameObject.Find("GameController").GetComponent<GameController>().ObjectEaten(
+            //    hit.collider.gameObject.GetComponent<Objects>().originalPos, 
+            //    hit.collider.gameObject.GetComponent<Objects>().originalRot, 
+            //    hit.collider.gameObject.GetComponent<Objects>().GetObjItIs());
 
             hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
 
@@ -244,6 +248,10 @@ public class Hungerin : MonoBehaviour
             LaunchToDirection(hit.collider.gameObject.transform.position);
             StartCoroutine("PlayerIsForced");
         }
+    }
+    private void EatPowerUp(RaycastHit hit)
+    {
+        hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
     }
     private void Grapple(RaycastHit hit)
     {
@@ -292,7 +300,6 @@ public class Hungerin : MonoBehaviour
         {
             if(transform.localScale.x > minSize && eatenGameObjects.Count > 0)
             {
-                
                 // Spit
                 GameObject bullet = Instantiate(bulletPrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
                 Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
@@ -303,26 +310,15 @@ public class Hungerin : MonoBehaviour
 
                 //Eliminate stored object from the stack and store the values
                 EssencialProperties objToSpit;
-                //if (eatenGameObjects.Count == 0)
-                //{
-                //    SumSize(-2.0f);
-                //    MinScalarSize(-1.0f);
-                //    SumWeight(-1.0f);
-                //    SetNewMass(m_EssencialProperties.weight);
-                    
-                //}
-                //else
-                {
-                    objToSpit = eatenGameObjects.Peek();
-                    eatenGameObjects.Pop();
-                    GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
-                    SumSize(-objToSpit.largeSize);
-                    MinScalarSize(-objToSpit.largeSize);
-                    SumWeight(-objToSpit.weight);
-                    SetNewMass(m_EssencialProperties.weight);
-                }
 
-                
+
+                objToSpit = eatenGameObjects.Peek();
+                eatenGameObjects.Pop();
+                //GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
+                SumSize(-objToSpit.largeSize);
+                MinScalarSize(-objToSpit.largeSize);
+                SumWeight(-objToSpit.weight);
+                SetNewMass(m_EssencialProperties.weight);
             }
 
             spitInputButton = false;
@@ -363,7 +359,7 @@ public class Hungerin : MonoBehaviour
                 m_RigidBody.velocity = direction * speed * Time.fixedDeltaTime;
             }
 
-            isCollapsing = false;
+            StartCoroutine("DisableIsCollapsing");
         }
         else
         {
@@ -376,9 +372,6 @@ public class Hungerin : MonoBehaviour
                     canDoubleJump = false;
                     spaceInputButton = false;
                     isCollapsing = true;
-                    // IF SPHERE COLLIDING WITH BROKEN BOX
-
-                    // IF = BUT ENEMIES
                 }
                 else
                 {
@@ -533,6 +526,11 @@ public class Hungerin : MonoBehaviour
     {
         yield return new WaitForSeconds(2f);
         canDoubleJump = false;
+        isCollapsing = false;
+    }
+    IEnumerator DisableIsCollapsing()
+    {
+        yield return new WaitForSeconds(0.2f);
         isCollapsing = false;
     }
 
