@@ -424,6 +424,9 @@ public class Hungerin : MonoBehaviour
                 {
                     Vector3 gravity = globalGravity * gravityScale * gravityCollapseScale * Vector3.up;
                     m_RigidBody.AddForce(gravity, ForceMode.Acceleration);
+
+                    CinemachineShake.Instance.ShakeCamera(5f,0.2f);
+
                     canDoubleJump = false;
                     spaceInputButton = false;
                     isCollapsing = true;
