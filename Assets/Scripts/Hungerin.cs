@@ -596,13 +596,13 @@ public class Hungerin : MonoBehaviour
     IEnumerator TakingDamage()
     {
         Color originalColor = m_Material.color;
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.02f);
         m_Material.color = Color.white;
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.02f);
         m_Material.color = originalColor;
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.02f);
         m_Material.color = Color.white;
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.02f);
         m_Material.color = originalColor;
     }
 

@@ -7,7 +7,8 @@ public class Enemy : MonoBehaviour
     [SerializeField] private Rigidbody m_Rb;
     [SerializeField] private GameObject player;
     [SerializeField] private LineRenderer m_LineRenderer;
-
+    [SerializeField] private Material m_Material;
+    
     [SerializeField] private float health = 100f;
 
     [Space]
@@ -175,6 +176,19 @@ public class Enemy : MonoBehaviour
     public void TakeDamage(float damage)
     {
         health -= damage;
+        StartCoroutine("TakingDamage");
+    }
+    IEnumerator TakingDamage()
+    {
+        Color originalColor = m_Material.color;
+        yield return new WaitForSeconds(0.02f);
+        m_Material.color = Color.white;
+        yield return new WaitForSeconds(0.02f);
+        m_Material.color = originalColor;
+        yield return new WaitForSeconds(0.02f);
+        m_Material.color = Color.white;
+        yield return new WaitForSeconds(0.02f);
+        m_Material.color = originalColor;
     }
     IEnumerator DisableForcedSeeking()
     {
