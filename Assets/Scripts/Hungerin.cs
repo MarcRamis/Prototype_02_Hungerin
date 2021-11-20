@@ -247,10 +247,10 @@ public class Hungerin : MonoBehaviour
             tempProperties.weight = hit.transform.gameObject.GetComponent<Objects>().GetSumWeight();
             eatenGameObjects.Push(tempProperties);
             //GameController stores the objects that are missing in the scene
-            //GameObject.Find("GameController").GetComponent<GameController>().ObjectEaten(
-            //    hit.collider.gameObject.GetComponent<Objects>().originalPos, 
-            //    hit.collider.gameObject.GetComponent<Objects>().originalRot, 
-            //    hit.collider.gameObject.GetComponent<Objects>().GetObjItIs());
+            GameObject.Find("GameController").GetComponent<GameController>().ObjectEaten(
+                hit.collider.gameObject.GetComponent<Objects>().originalPos, 
+                hit.collider.gameObject.GetComponent<Objects>().originalRot, 
+                hit.collider.gameObject.GetComponent<Objects>().GetObjItIs());
 
             hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
 
@@ -330,7 +330,7 @@ public class Hungerin : MonoBehaviour
 
                 objToSpit = eatenGameObjects.Peek();
                 eatenGameObjects.Pop();
-                //GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
+                GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
                 SumSize(-objToSpit.largeSize);
                 MinScalarSize(-objToSpit.largeSize);
                 SumWeight(-objToSpit.weight);
