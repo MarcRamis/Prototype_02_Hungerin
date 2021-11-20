@@ -569,7 +569,7 @@ public class Hungerin : MonoBehaviour
         {
             m_EssencialProperties.largeSize = minSize;
         }
-        
+        StartCoroutine("TakingDamage");
     }
    
     IEnumerator DisableTongue()
@@ -592,6 +592,18 @@ public class Hungerin : MonoBehaviour
     {
         yield return new WaitForSeconds(0.2f);
         isCollapsing = false;
+    }
+    IEnumerator TakingDamage()
+    {
+        Color originalColor = m_Material.color;
+        yield return new WaitForSeconds(0.1f);
+        m_Material.color = Color.white;
+        yield return new WaitForSeconds(0.1f);
+        m_Material.color = originalColor;
+        yield return new WaitForSeconds(0.1f);
+        m_Material.color = Color.white;
+        yield return new WaitForSeconds(0.1f);
+        m_Material.color = originalColor;
     }
 
     public void ResetMassPlayer()
