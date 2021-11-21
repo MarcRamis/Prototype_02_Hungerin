@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,7 @@ public class GameController : MonoBehaviour
     private bool inputResetMass = false;
     private bool inputLastLevel = false;
     private bool inputNextLevel = false;
+    private bool inputResetLevel = false;
 
     //Reload Scene
     public bool reloadScene { get; set; } = false;
@@ -111,6 +113,10 @@ public class GameController : MonoBehaviour
         {
             inputNextLevel = true;
         }
+        if (Input.GetKeyDown(KeyCode.F9))
+        {
+            inputResetLevel = true;
+        }
     }
     private void ControlCheats()
     {
@@ -137,7 +143,19 @@ public class GameController : MonoBehaviour
             NextSpawn();
             inputNextLevel = false;
         }
+
+        if(inputResetLevel)
+        {
+            ResetLevel();
+            inputResetLevel = false;
+        }
     }
+
+    private void ResetLevel()
+    {
+        SceneManager.LoadScene(0);
+    }
+
     private void SetPlayerInfiniteHealth()
     {
         if (GameObject.FindGameObjectWithTag("Player").GetComponent<Hungerin>().infiniteHealth)

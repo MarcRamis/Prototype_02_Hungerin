@@ -452,6 +452,8 @@ public class Hungerin : MonoBehaviour
             {
                 Vector3 gravity = globalGravity * gravityScale * Vector3.up;
                 m_RigidBody.AddForce(gravity, ForceMode.Acceleration);
+
+                spaceInputButton = false;
             }
 
             spaceInputButton = false;   // This is because if you press space input button again in air it makes another jump without pressing at that moment
@@ -612,7 +614,7 @@ public class Hungerin : MonoBehaviour
     }
     IEnumerator DisableIsCollapsing()
     {
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(1f);
         isCollapsing = false;
     }
     IEnumerator TakingDamage()
