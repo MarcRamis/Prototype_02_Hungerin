@@ -161,16 +161,23 @@ public class Enemy : MonoBehaviour
     }
     private void MakeAttack(Vector3 _target)
     {
-        Vector3 direction = _target - transform.position;
-        Ray raycastTarget = new Ray(transform.position, direction.normalized);
-        RaycastHit hit;
-
-        if (Physics.Raycast(raycastTarget, out hit, attackRadius))
+        if(_target != null)
         {
-            // Implement logic when hit player
-            //hit.collider.gameObject.GetComponent<Hungerin>().TakeDamage(1f);
-            Debug.Log(hit.collider.gameObject.name + " TakeDamage");
+            Vector3 direction = _target - transform.position;
+            Ray raycastTarget = new Ray(transform.position, direction.normalized);
+            RaycastHit hit;
+
+            if (Physics.Raycast(raycastTarget, out hit, attackRadius) && Vector3.Distance(_target, this.gameObject.transform.position) < attackRadius && player != null)
+            {
+                // Implement logic when hit player
+                if(hit.collider.gameObject != null)
+                {
+                    player.GetComponent<Hungerin>().TakeDamage();
+                }
+                
+            }
         }
+        
     }
     public void TakeDamage(float damage)
     {

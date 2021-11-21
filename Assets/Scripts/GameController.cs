@@ -1,16 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
     private Stack<SceneObjects> objEaten = new Stack<SceneObjects>();
-
+    private SceneObjects powerUp = default;
     //Inputs bools
     private bool inputInfiniteHealth = false;
     private bool inputResetMass = false;
     private bool inputLastLevel = false;
     private bool inputNextLevel = false;
+
+    //Reload Scene
+    public bool reloadScene { get; set; } = false;
+    [SerializeField] private float timeToReloadScene = 5.0f;
+    private float timerScene = 0.0f;
 
     //Spawns that are in the Scene
     [SerializeField] private GameObject[] spawns = null;
@@ -24,11 +30,21 @@ public class GameController : MonoBehaviour
         tempObj.typeObj = _type;
         objEaten.Push(tempObj);
     }
-
+    public void PowerUpsEaten(Vector3 _pos, Quaternion _rot, Objects.ObjType _type)
+    {
+        if(powerUp.objPos != default)
+        {
+            ReSpawnPowerUp();
+        }
+        powerUp.objPos = _pos;
+        powerUp.objRot = _rot;
+        powerUp.typeObj = _type;
+    }
     private void Update()
     {
         GetCheatInputs();
         ControlCheats();
+        ReloadScene();
     }
     public void ReSpawnObj()
     {
@@ -56,7 +72,24 @@ public class GameController : MonoBehaviour
         }
         objEaten.Pop();
     }
-
+    private void ReSpawnPowerUp()
+    {
+        GameObject assetPrefab = null;
+        switch (powerUp.typeObj)
+        {
+            case (Objects.ObjType.PU_CHILE):
+                assetPrefab = Resources.Load<GameObject>("Prefabs/PU_Chile");
+                Instantiate(assetPrefab, powerUp.objPos, powerUp.objRot, GameObject.Find("Eateable_Objects").transform);
+                break;
+            case (Objects.ObjType.PU_COLLAPSE):
+                assetPrefab = Resources.Load<GameObject>("Prefabs/PU_Melon_Collapse");
+                Instantiate(assetPrefab, powerUp.objPos, powerUp.objRot, GameObject.Find("Eateable_Objects").transform);
+                break;
+            default:
+                Debug.Log("Couldn't find gameObject to Respawn");
+                break;
+        }
+    }
     private void GetCheatInputs()
     {
         if(Input.GetKeyDown(KeyCode.F1))
@@ -146,6 +179,23 @@ public class GameController : MonoBehaviour
             GameObject.FindGameObjectWithTag("Player").transform.position = spawns[spawnToGo].transform.position;
         }
     }
+
+    private void ReloadScene()
+    {
+        if(reloadScene)
+        {
+            if(timeToReloadScene <= timerScene)
+            {
+                SceneManager.LoadScene(0);
+            }
+            else
+            {
+                timerScene += Time.deltaTime;
+            }
+        }
+        
+    }
+
 }
 struct SceneObjects
 {

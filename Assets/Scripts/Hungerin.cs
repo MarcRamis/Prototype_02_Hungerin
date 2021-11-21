@@ -120,8 +120,6 @@ public class Hungerin : MonoBehaviour
     // Here we make physics
     private void FixedUpdate()
     {
-        if (m_EssencialProperties.largeSize <= 0 && !infiniteHealth) { Debug.Log(name + " died"); }
-        else if(m_EssencialProperties.largeSize <= 0 && infiniteHealth) { m_EssencialProperties.largeSize = minSize; }
         switch(m_TypeTransformation)
         {
             case TypeTransformation.NORMAL:
@@ -198,26 +196,29 @@ public class Hungerin : MonoBehaviour
 
                 if (hit.collider.gameObject.layer == LayerMask.NameToLayer("EatenItem"))
                 {
-                    if (hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.EATEN) {
-                        Eat(hit);
-                    }
-                    else if(hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.GRIPPY)
+                    switch(hit.collider.gameObject.GetComponent<Objects>().GetEType())
                     {
-                        Grapple(hit);
+                        case (Objects.ItemType.EATEN):
+                            Eat(hit);
+                            break;
+                        case (Objects.ItemType.GRIPPY):
+                            Grapple(hit);
+                            break;
+                        case (Objects.ItemType.POWERUP_COLLAPSE):
+                            EatPowerUp(hit);
+                            m_TypeTransformation = TypeTransformation.COLLAPSE;
+                            ChangeFormTransformation();
+                            break;
+                        case (Objects.ItemType.POWERUP_CHILE):
+                            EatPowerUp(hit);
+                            m_TypeTransformation = TypeTransformation.CHILE;
+                            ChangeFormTransformation();
+                            break;
+                        case (Objects.ItemType.CAKE_END):
+                            GameObject.Find("GameController").GetComponent<GameController>().reloadScene = true;
+                            hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
+                            break;
                     }
-                    else if (hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.POWERUP_COLLAPSE)
-                    {
-                        EatPowerUp(hit);
-                        m_TypeTransformation = TypeTransformation.COLLAPSE;
-                        ChangeFormTransformation();
-                    }
-                    else if(hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.POWERUP_CHILE)
-                    {
-                        EatPowerUp(hit);
-                        m_TypeTransformation = TypeTransformation.CHILE;
-                        ChangeFormTransformation();
-                    }
-
                 }
             }
             eatInputButton = false;
@@ -247,10 +248,10 @@ public class Hungerin : MonoBehaviour
             tempProperties.weight = hit.transform.gameObject.GetComponent<Objects>().GetSumWeight();
             eatenGameObjects.Push(tempProperties);
             //GameController stores the objects that are missing in the scene
-            //GameObject.Find("GameController").GetComponent<GameController>().ObjectEaten(
-            //    hit.collider.gameObject.GetComponent<Objects>().originalPos, 
-            //    hit.collider.gameObject.GetComponent<Objects>().originalRot, 
-            //    hit.collider.gameObject.GetComponent<Objects>().GetObjItIs());
+            GameObject.Find("GameController").GetComponent<GameController>().ObjectEaten(
+                hit.collider.gameObject.GetComponent<Objects>().originalPos, 
+                hit.collider.gameObject.GetComponent<Objects>().originalRot, 
+                hit.collider.gameObject.GetComponent<Objects>().GetObjItIs());
 
             hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
 
@@ -269,6 +270,10 @@ public class Hungerin : MonoBehaviour
     private void EatPowerUp(RaycastHit hit)
     {
         hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
+        GameObject.Find("GameController").GetComponent<GameController>().PowerUpsEaten(
+                hit.collider.gameObject.GetComponent<Objects>().originalPos,
+                hit.collider.gameObject.GetComponent<Objects>().originalRot,
+                hit.collider.gameObject.GetComponent<Objects>().GetObjItIs());
     }
     private void Grapple(RaycastHit hit)
     {
@@ -300,7 +305,6 @@ public class Hungerin : MonoBehaviour
     {
         // I set this to true to control enemy damage. Now is like a bullet
         grabObj.GetComponent<Objects>().isBeingLaunched = true;
-        Debug.Log(grabObj.GetComponent<Objects>().isBeingLaunched);
         // Force direction
         Vector3 direction = m_Target.transform.position - grabObj.transform.position;
         direction = direction.normalized;
@@ -315,26 +319,29 @@ public class Hungerin : MonoBehaviour
     {
         if (spitInputButton)
         {
-            if(transform.localScale.x > minSize && eatenGameObjects.Count > 0)
+            if (!isGrappeling)
             {
-                // Spit
-                GameObject bullet = Instantiate(bulletPrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
-                Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+                if (transform.localScale.x > minSize && eatenGameObjects.Count > 0)
+                {
+                    // Spit
+                    GameObject bullet = Instantiate(bulletPrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
+                    Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
 
-                // Spit force
-                Vector3 direction = m_Target.position - m_SpitSpawn.position;
-                bulletRb.AddForce(direction.normalized * bulletSpeed, ForceMode.Impulse);
+                    // Spit force
+                    Vector3 direction = m_Target.position - m_SpitSpawn.position;
+                    bulletRb.AddForce(direction.normalized * bulletSpeed, ForceMode.Impulse);
 
-                //Eliminate stored object from the stack and store the values
-                EssencialProperties objToSpit;
+                    //Eliminate stored object from the stack and store the values
+                    EssencialProperties objToSpit;
 
-                objToSpit = eatenGameObjects.Peek();
-                eatenGameObjects.Pop();
-                //GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
-                SumSize(-objToSpit.largeSize);
-                MinScalarSize(-objToSpit.largeSize);
-                SumWeight(-objToSpit.weight);
-                SetNewMass(m_EssencialProperties.weight);
+                    objToSpit = eatenGameObjects.Peek();
+                    eatenGameObjects.Pop();
+                    GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
+                    SumSize(-objToSpit.largeSize);
+                    MinScalarSize(-objToSpit.largeSize);
+                    SumWeight(-objToSpit.weight);
+                    SetNewMass(m_EssencialProperties.weight);
+                }
             }
 
             spitInputButton = false;
@@ -344,36 +351,39 @@ public class Hungerin : MonoBehaviour
     {
         if (spitInputButton)
         {
-            if (transform.localScale.x > minSize && eatenGameObjects.Count > 0)
+            if (!isGrappeling)
             {
-                // Spit
-                GameObject bullet = Instantiate(bulletFirePrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
-                Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+                if (transform.localScale.x > minSize && eatenGameObjects.Count > 0)
+                {
+                    // Spit
+                    GameObject bullet = Instantiate(bulletFirePrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
+                    Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
 
-                // Spit force
-                Vector3 direction = m_Target.position - m_SpitSpawn.position;
-                bulletRb.AddForce(direction.normalized * bulletFireSpeed, ForceMode.Impulse);
+                    // Spit force
+                    Vector3 direction = m_Target.position - m_SpitSpawn.position;
+                    bulletRb.AddForce(direction.normalized * bulletFireSpeed, ForceMode.Impulse);
 
-                //Eliminate stored object from the stack and store the values
-                EssencialProperties objToSpit;
+                    //Eliminate stored object from the stack and store the values
+                    EssencialProperties objToSpit;
 
-                objToSpit = eatenGameObjects.Peek();
-                eatenGameObjects.Pop();
-                //GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
-                SumSize(-objToSpit.largeSize);
-                MinScalarSize(-objToSpit.largeSize);
-                SumWeight(-objToSpit.weight);
-                SetNewMass(m_EssencialProperties.weight);
-            }
-            else
-            {
-                // Spit
-                GameObject bullet = Instantiate(bulletFirePrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
-                Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+                    objToSpit = eatenGameObjects.Peek();
+                    eatenGameObjects.Pop();
+                    GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
+                    SumSize(-objToSpit.largeSize);
+                    MinScalarSize(-objToSpit.largeSize);
+                    SumWeight(-objToSpit.weight);
+                    SetNewMass(m_EssencialProperties.weight);
+                }
+                else
+                {
+                    // Spit
+                    GameObject bullet = Instantiate(bulletFirePrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
+                    Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
 
-                // Spit force
-                Vector3 direction = m_Target.position - m_SpitSpawn.position;
-                bulletRb.AddForce(direction.normalized * bulletSpeed, ForceMode.Impulse);
+                    // Spit force
+                    Vector3 direction = m_Target.position - m_SpitSpawn.position;
+                    bulletRb.AddForce(direction.normalized * bulletSpeed, ForceMode.Impulse);
+                }
             }
 
             spitInputButton = false;
@@ -559,16 +569,26 @@ public class Hungerin : MonoBehaviour
         float distanceAToB = Vector3.Distance(transform.position, target);
         return distanceAToB <= collapseAttackRadius;
     }
-    public void TakeDamage(float damage)
+    public void TakeDamage()
     {
-        if(!infiniteHealth)
+        
+        if(eatenGameObjects.Count != 0)
         {
-            m_EssencialProperties.largeSize -= damage;
+            EssencialProperties objToSpit;
+
+            objToSpit = eatenGameObjects.Peek();
+            eatenGameObjects.Pop();
+            GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
+            SumSize(-objToSpit.largeSize);
+            MinScalarSize(-objToSpit.largeSize);
+            SumWeight(-objToSpit.weight);
+            SetNewMass(m_EssencialProperties.weight);
         }
-        else if(m_EssencialProperties.largeSize - damage < minSize)
+        else if(!infiniteHealth)
         {
-            m_EssencialProperties.largeSize = minSize;
+            GameObject.Find("BoxRespawner").GetComponent<ReSpawn>().RespawnPlayer(this.gameObject);
         }
+            
         
     }
    

@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Objects : MonoBehaviour
 {
-    public enum ItemType { EATEN, GRIPPY, POWERUP_COLLAPSE, POWERUP_CHILE };
-    private enum SizeType { SMALL, MEDIUM, BIG, DEFAULT };
-    public enum ObjType {  JEWEL, LOG, LOGSTACK, CRATE, DEFAULT };
+    public enum ItemType { EATEN, GRIPPY, POWERUP_COLLAPSE, POWERUP_CHILE, CAKE_END };
+    private enum SizeType { SMALL, MEDIUM, BIG, NONE, DEFAULT };
+    public enum ObjType {  JEWEL, LOG, LOGSTACK, CRATE, PU_COLLAPSE, PU_CHILE, DEFAULT };
     private Rigidbody m_Rigidbody;
     [SerializeField] private EssencialProperties m_essencialProperties;
     [SerializeField] private SizeType typeObj = SizeType.DEFAULT;
@@ -24,8 +24,6 @@ public class Objects : MonoBehaviour
     private void Awake()
     {
         m_Rigidbody = gameObject.GetComponent<Rigidbody>();
-        m_essencialProperties.weight = 1;
-        m_Rigidbody.mass = m_essencialProperties.weight;
         originalPos = transform.position;
         originalRot = transform.localRotation;
 
@@ -42,6 +40,8 @@ public class Objects : MonoBehaviour
             case (SizeType.BIG):
                 sumSize = 20;
                 sumWeight = 1f;
+                break;
+            case (SizeType.NONE):
                 break;
             case (SizeType.DEFAULT):
                 Debug.Log("Forgot to init values");
@@ -83,11 +83,10 @@ public class Objects : MonoBehaviour
         if (collision.collider.gameObject.layer != LayerMask.NameToLayer("Player") 
             && isBeingLaunched)
         {
-            Debug.Log(collision.collider.gameObject);
 
             if (collision.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
             {
-                collision.collider.gameObject.GetComponent<Enemy>().TakeDamage(100f);
+                collision.collider.gameObject.GetComponent<Enemy>().TakeDamage(50f);
                 collision.collider.gameObject.GetComponent<Enemy>().isForcedToSeek = true;
 
                 isBeingLaunched = false;
