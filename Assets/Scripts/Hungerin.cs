@@ -120,8 +120,6 @@ public class Hungerin : MonoBehaviour
     // Here we make physics
     private void FixedUpdate()
     {
-        if (m_EssencialProperties.largeSize <= 0 && !infiniteHealth) { Debug.Log(name + " died"); }
-        else if(m_EssencialProperties.largeSize <= 0 && infiniteHealth) { m_EssencialProperties.largeSize = minSize; }
         switch(m_TypeTransformation)
         {
             case TypeTransformation.NORMAL:
@@ -198,26 +196,29 @@ public class Hungerin : MonoBehaviour
 
                 if (hit.collider.gameObject.layer == LayerMask.NameToLayer("EatenItem"))
                 {
-                    if (hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.EATEN) {
-                        Eat(hit);
-                    }
-                    else if(hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.GRIPPY)
+                    switch(hit.collider.gameObject.GetComponent<Objects>().GetEType())
                     {
-                        Grapple(hit);
+                        case (Objects.ItemType.EATEN):
+                            Eat(hit);
+                            break;
+                        case (Objects.ItemType.GRIPPY):
+                            Grapple(hit);
+                            break;
+                        case (Objects.ItemType.POWERUP_COLLAPSE):
+                            EatPowerUp(hit);
+                            m_TypeTransformation = TypeTransformation.COLLAPSE;
+                            ChangeFormTransformation();
+                            break;
+                        case (Objects.ItemType.POWERUP_CHILE):
+                            EatPowerUp(hit);
+                            m_TypeTransformation = TypeTransformation.CHILE;
+                            ChangeFormTransformation();
+                            break;
+                        case (Objects.ItemType.CAKE_END):
+                            GameObject.Find("GameController").GetComponent<GameController>().reloadScene = true;
+                            hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
+                            break;
                     }
-                    else if (hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.POWERUP_COLLAPSE)
-                    {
-                        EatPowerUp(hit);
-                        m_TypeTransformation = TypeTransformation.COLLAPSE;
-                        ChangeFormTransformation();
-                    }
-                    else if(hit.collider.gameObject.GetComponent<Objects>().GetEType() == Objects.ItemType.POWERUP_CHILE)
-                    {
-                        EatPowerUp(hit);
-                        m_TypeTransformation = TypeTransformation.CHILE;
-                        ChangeFormTransformation();
-                    }
-
                 }
             }
             eatInputButton = false;
@@ -269,6 +270,10 @@ public class Hungerin : MonoBehaviour
     private void EatPowerUp(RaycastHit hit)
     {
         hit.collider.gameObject.GetComponent<Objects>().MoveToPlayer(transform.position);
+        GameObject.Find("GameController").GetComponent<GameController>().PowerUpsEaten(
+                hit.collider.gameObject.GetComponent<Objects>().originalPos,
+                hit.collider.gameObject.GetComponent<Objects>().originalRot,
+                hit.collider.gameObject.GetComponent<Objects>().GetObjItIs());
     }
     private void Grapple(RaycastHit hit)
     {
@@ -300,7 +305,6 @@ public class Hungerin : MonoBehaviour
     {
         // I set this to true to control enemy damage. Now is like a bullet
         grabObj.GetComponent<Objects>().isBeingLaunched = true;
-        Debug.Log(grabObj.GetComponent<Objects>().isBeingLaunched);
         // Force direction
         Vector3 direction = m_Target.transform.position - grabObj.transform.position;
         direction = direction.normalized;
@@ -559,16 +563,26 @@ public class Hungerin : MonoBehaviour
         float distanceAToB = Vector3.Distance(transform.position, target);
         return distanceAToB <= collapseAttackRadius;
     }
-    public void TakeDamage(float damage)
+    public void TakeDamage()
     {
-        if(!infiniteHealth)
+        
+        if(eatenGameObjects.Count != 0)
         {
-            m_EssencialProperties.largeSize -= damage;
+            EssencialProperties objToSpit;
+
+            objToSpit = eatenGameObjects.Peek();
+            eatenGameObjects.Pop();
+            GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
+            SumSize(-objToSpit.largeSize);
+            MinScalarSize(-objToSpit.largeSize);
+            SumWeight(-objToSpit.weight);
+            SetNewMass(m_EssencialProperties.weight);
         }
-        else if(m_EssencialProperties.largeSize - damage < minSize)
+        else if(!infiniteHealth)
         {
-            m_EssencialProperties.largeSize = minSize;
+            GameObject.Find("BoxRespawner").GetComponent<ReSpawn>().RespawnPlayer(this.gameObject);
         }
+            
         
     }
    

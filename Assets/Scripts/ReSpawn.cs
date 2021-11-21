@@ -46,6 +46,11 @@ public class ReSpawn : MonoBehaviour
         }
     }
 
+    public void RespawnPlayer(GameObject player)
+    {
+        player.transform.position = reSpawn.transform.position;
+    }
+
     public void SetNewSpawn(GameObject _spawn)
     {
         reSpawn = _spawn;

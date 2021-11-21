@@ -18,7 +18,6 @@ public class Fragile_WoodPlatform : MonoBehaviour
     {
         if (other.gameObject.tag == "Player")
         {
-            Debug.Log(other.gameObject.GetComponent<Rigidbody>().velocity.y);
             if (other.gameObject.GetComponent<Hungerin>().GetWeight() >= weightToBreak && other.gameObject.GetComponent<Rigidbody>().velocity.y < minVelocityTobreak)
             {
 

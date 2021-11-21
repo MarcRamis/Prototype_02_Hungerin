@@ -229,7 +229,7 @@ MonoBehaviour:
   health: 100
   detectionRadius: 5.5
   fleeRadius: 2
-  speed: 120
+  speed: 80
   turnSmoothTime: 0.1
   attackRadius: 3
   m_Grounded: {fileID: 367370121}

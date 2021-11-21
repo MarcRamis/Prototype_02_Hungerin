@@ -453,6 +453,8 @@ MonoBehaviour:
   groundMask:
   - serializedVersion: 2
     m_Bits: 64
+  - serializedVersion: 2
+    m_Bits: 256
   turnSmoothTime: 0.1
   gravityScale: 15
   globalGravity: -9.81
@@ -467,10 +469,11 @@ MonoBehaviour:
   m_SpitSpawn: {fileID: 1857337520}
   bulletPrefab: {fileID: 1928512621476752723, guid: b0d49576a4e47e040a06ccae2a016676, type: 3}
   bulletSpeed: 15
-  m_TypeTransformation: 0
-  collapseAttackRadius: 3
   grappledObjectWhenMovingRadius: 0.5
   grappledObjectLaunchSpeed: 200
+  collapseAttackRadius: 3
+  bulletFirePrefab: {fileID: 0}
+  bulletFireSpeed: 20
 --- !u!120 &511783492
 LineRenderer:
   m_ObjectHideFlags: 0

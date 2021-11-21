@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Objects : MonoBehaviour
 {
-    public enum ItemType { EATEN, GRIPPY, POWERUP_COLLAPSE, POWERUP_CHILE };
-    private enum SizeType { SMALL, MEDIUM, BIG, DEFAULT };
-    public enum ObjType {  JEWEL, LOG, LOGSTACK, CRATE, DEFAULT };
+    public enum ItemType { EATEN, GRIPPY, POWERUP_COLLAPSE, POWERUP_CHILE, CAKE_END };
+    private enum SizeType { SMALL, MEDIUM, BIG, NONE, DEFAULT };
+    public enum ObjType {  JEWEL, LOG, LOGSTACK, CRATE, PU_COLLAPSE, PU_CHILE, DEFAULT };
     private Rigidbody m_Rigidbody;
     [SerializeField] private EssencialProperties m_essencialProperties;
     [SerializeField] private SizeType typeObj = SizeType.DEFAULT;
@@ -42,6 +42,8 @@ public class Objects : MonoBehaviour
             case (SizeType.BIG):
                 sumSize = 20;
                 sumWeight = 1f;
+                break;
+            case (SizeType.NONE):
                 break;
             case (SizeType.DEFAULT):
                 Debug.Log("Forgot to init values");
@@ -83,7 +85,6 @@ public class Objects : MonoBehaviour
         if (collision.collider.gameObject.layer != LayerMask.NameToLayer("Player") 
             && isBeingLaunched)
         {
-            Debug.Log(collision.collider.gameObject);
 
             if (collision.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
             {
