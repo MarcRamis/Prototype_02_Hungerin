@@ -15,7 +15,7 @@ public class BulletFire : MonoBehaviour
         {
             if (collision.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
             {
-                collision.collider.gameObject.GetComponent<Enemy>().TakeDamage(30f);
+                collision.collider.gameObject.GetComponent<Enemy>().TakeDamage(20f);
                 collision.collider.gameObject.GetComponent<Enemy>().isForcedToSeek = true;
             }
 
