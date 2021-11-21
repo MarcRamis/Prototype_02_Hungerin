@@ -368,7 +368,7 @@ public class Hungerin : MonoBehaviour
 
                     objToSpit = eatenGameObjects.Peek();
                     eatenGameObjects.Pop();
-                    //GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
+                    GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
                     SumSize(-objToSpit.largeSize);
                     MinScalarSize(-objToSpit.largeSize);
                     SumWeight(-objToSpit.weight);

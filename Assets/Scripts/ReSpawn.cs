@@ -38,10 +38,8 @@ public class ReSpawn : MonoBehaviour
                     Destroy(other.gameObject);
                     break;
                 case (Objects.ObjType.CRATE):
-                    //assetPrefab = Resources.Load<GameObject>("Prefabs/Crate");
                     other.gameObject.transform.position = tempPos;
                     other.gameObject.transform.rotation = tempRot;
-                    //Instantiate(assetPrefab, tempPos, tempRot, GameObject.Find("NotEateable").transform);
                     break;
                 default:
                     Debug.Log("Couldn't find gameObject to Respawn");
