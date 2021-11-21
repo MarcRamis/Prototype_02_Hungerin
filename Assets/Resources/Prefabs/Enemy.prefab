@@ -226,6 +226,7 @@ MonoBehaviour:
   m_Rb: {fileID: 3780620150402426880}
   player: {fileID: 0}
   m_LineRenderer: {fileID: 3780620150402426882}
+  m_Material: {fileID: 2100000, guid: c3b584f3b596ecb4bbcc6e8de426f947, type: 2}
   health: 100
   detectionRadius: 5.5
   fleeRadius: 2

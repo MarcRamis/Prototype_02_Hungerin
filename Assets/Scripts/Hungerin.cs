@@ -434,6 +434,9 @@ public class Hungerin : MonoBehaviour
                 {
                     Vector3 gravity = globalGravity * gravityScale * gravityCollapseScale * Vector3.up;
                     m_RigidBody.AddForce(gravity, ForceMode.Acceleration);
+
+                    CinemachineShake.Instance.ShakeCamera(5f,0.2f);
+
                     canDoubleJump = false;
                     spaceInputButton = false;
                     isCollapsing = true;
@@ -588,8 +591,7 @@ public class Hungerin : MonoBehaviour
         {
             GameObject.Find("BoxRespawner").GetComponent<ReSpawn>().RespawnPlayer(this.gameObject);
         }
-            
-        
+        StartCoroutine("TakingDamage");
     }
    
     IEnumerator DisableTongue()
@@ -612,6 +614,18 @@ public class Hungerin : MonoBehaviour
     {
         yield return new WaitForSeconds(0.2f);
         isCollapsing = false;
+    }
+    IEnumerator TakingDamage()
+    {
+        Color originalColor = m_Material.color;
+        yield return new WaitForSeconds(0.02f);
+        m_Material.color = Color.white;
+        yield return new WaitForSeconds(0.02f);
+        m_Material.color = originalColor;
+        yield return new WaitForSeconds(0.02f);
+        m_Material.color = Color.white;
+        yield return new WaitForSeconds(0.02f);
+        m_Material.color = originalColor;
     }
 
     public void ResetMassPlayer()
