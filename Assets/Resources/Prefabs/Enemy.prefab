@@ -227,6 +227,9 @@ MonoBehaviour:
   player: {fileID: 0}
   m_LineRenderer: {fileID: 3780620150402426882}
   m_Material: {fileID: 2100000, guid: c3b584f3b596ecb4bbcc6e8de426f947, type: 2}
+  m_MaterialWhite: {fileID: 2100000, guid: 56f328b270cf5314f8b1c2a637074497, type: 2}
+  m_MeshRenderer: {fileID: 3780620150402426885}
+  m_MeshRendererDir: {fileID: 318437327}
   health: 100
   detectionRadius: 5.5
   fleeRadius: 2

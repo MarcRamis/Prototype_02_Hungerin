@@ -8,7 +8,11 @@ public class Enemy : MonoBehaviour
     [SerializeField] private GameObject player;
     [SerializeField] private LineRenderer m_LineRenderer;
     [SerializeField] private Material m_Material;
-    
+    [SerializeField] private Material m_MaterialWhite;
+    [SerializeField] private MeshRenderer m_MeshRenderer;
+    [SerializeField] private MeshRenderer m_MeshRendererDir;
+    private Material ownMaterial;
+
     [SerializeField] private float health = 100f;
 
     [Space]
@@ -46,6 +50,9 @@ public class Enemy : MonoBehaviour
     private void Awake()
     {
         m_LineRenderer.enabled = false;
+        
+        ownMaterial = m_Material;
+        m_MeshRenderer.material = ownMaterial;
     }
 
     private void FixedUpdate()
@@ -187,15 +194,18 @@ public class Enemy : MonoBehaviour
     }
     IEnumerator TakingDamage()
     {
-        Color originalColor = m_Material.color;
         yield return new WaitForSeconds(0.02f);
-        m_Material.color = Color.white;
+        m_MeshRenderer.material = m_MaterialWhite;
+        m_MeshRendererDir.material = m_MaterialWhite;
         yield return new WaitForSeconds(0.02f);
-        m_Material.color = originalColor;
+        m_MeshRenderer.material = m_Material;
+        m_MeshRendererDir.material = m_Material;
         yield return new WaitForSeconds(0.02f);
-        m_Material.color = Color.white;
+        m_MeshRenderer.material = m_MaterialWhite;
+        m_MeshRendererDir.material = m_MaterialWhite;
         yield return new WaitForSeconds(0.02f);
-        m_Material.color = originalColor;
+        m_MeshRenderer.material = m_Material;
+        m_MeshRendererDir.material = m_Material;
     }
     IEnumerator DisableForcedSeeking()
     {
