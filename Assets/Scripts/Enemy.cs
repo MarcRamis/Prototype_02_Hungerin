@@ -123,6 +123,7 @@ public class Enemy : MonoBehaviour
 
                         StartCoroutine("EnableCanTakeCollapseDamage");
                     }
+                    //player.GetComponent<Hungerin>().isCollapsing = false;
                 }
             }
         }

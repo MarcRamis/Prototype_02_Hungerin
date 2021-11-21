@@ -412,6 +412,8 @@ public class Hungerin : MonoBehaviour
 
         if (isGrounded)
         {
+            canDoubleJump = false;
+
             if (spaceInputButton)
             {
                 m_RigidBody.AddForce(new Vector3(direction.x * jumpForwardSpeed, jumpSpeed, direction.z * jumpForwardSpeed), ForceMode.Impulse);
@@ -423,8 +425,6 @@ public class Hungerin : MonoBehaviour
             {
                 m_RigidBody.velocity = direction * speed * Time.fixedDeltaTime;
             }
-
-            StartCoroutine("DisableIsCollapsing");
         }
         else
         {
@@ -440,20 +440,18 @@ public class Hungerin : MonoBehaviour
                     canDoubleJump = false;
                     spaceInputButton = false;
                     isCollapsing = true;
+                    StartCoroutine("DisableIsCollapsing");
                 }
                 else
                 {
                     Vector3 gravity = globalGravity * gravityScale * Vector3.up;
                     m_RigidBody.AddForce(gravity, ForceMode.Acceleration);
                 }
-                StartCoroutine("DisableDoubleJump");
             }
             else
             {
                 Vector3 gravity = globalGravity * gravityScale * Vector3.up;
                 m_RigidBody.AddForce(gravity, ForceMode.Acceleration);
-
-                spaceInputButton = false;
             }
 
             spaceInputButton = false;   // This is because if you press space input button again in air it makes another jump without pressing at that moment
@@ -608,13 +606,13 @@ public class Hungerin : MonoBehaviour
     }
     IEnumerator DisableDoubleJump()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
         canDoubleJump = false;
         isCollapsing = false;
     }
     IEnumerator DisableIsCollapsing()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.2f);
         isCollapsing = false;
     }
     IEnumerator TakingDamage()
