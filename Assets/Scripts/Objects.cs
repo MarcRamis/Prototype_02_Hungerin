@@ -6,7 +6,7 @@ public class Objects : MonoBehaviour
 {
     public enum ItemType { EATEN, GRIPPY, POWERUP_COLLAPSE, POWERUP_CHILE, CAKE_END };
     private enum SizeType { SMALL, MEDIUM, BIG, NONE, DEFAULT };
-    public enum ObjType {  JEWEL, LOG, LOGSTACK, CRATE, PU_COLLAPSE, PU_CHILE, DEFAULT };
+    public enum ObjType {  JEWEL, LOG, LOGSTACK, CRATE, PU_COLLAPSE, PU_CHILE, CAKE_END, DEFAULT };
     private Rigidbody m_Rigidbody;
     [SerializeField] private EssencialProperties m_essencialProperties;
     [SerializeField] private SizeType typeObj = SizeType.DEFAULT;

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7779989247111233437}
   m_Layer: 8
   m_Name: Cake_EndLevel
-  m_TagString: Untagged
+  m_TagString: CanBeEaten
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

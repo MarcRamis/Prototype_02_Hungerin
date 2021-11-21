@@ -41,6 +41,10 @@ public class ReSpawn : MonoBehaviour
                     other.gameObject.transform.position = tempPos;
                     other.gameObject.transform.rotation = tempRot;
                     break;
+                case (Objects.ObjType.CAKE_END):
+                    other.gameObject.transform.position = tempPos;
+                    other.gameObject.transform.rotation = tempRot;
+                    break;
                 default:
                     Debug.Log("Couldn't find gameObject to Respawn");
                     break;
