@@ -24,8 +24,6 @@ public class Objects : MonoBehaviour
     private void Awake()
     {
         m_Rigidbody = gameObject.GetComponent<Rigidbody>();
-        m_essencialProperties.weight = 1;
-        m_Rigidbody.mass = m_essencialProperties.weight;
         originalPos = transform.position;
         originalRot = transform.localRotation;
 

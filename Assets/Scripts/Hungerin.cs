@@ -319,26 +319,29 @@ public class Hungerin : MonoBehaviour
     {
         if (spitInputButton)
         {
-            if(transform.localScale.x > minSize && eatenGameObjects.Count > 0)
+            if (!isGrappeling)
             {
-                // Spit
-                GameObject bullet = Instantiate(bulletPrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
-                Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+                if (transform.localScale.x > minSize && eatenGameObjects.Count > 0)
+                {
+                    // Spit
+                    GameObject bullet = Instantiate(bulletPrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
+                    Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
 
-                // Spit force
-                Vector3 direction = m_Target.position - m_SpitSpawn.position;
-                bulletRb.AddForce(direction.normalized * bulletSpeed, ForceMode.Impulse);
+                    // Spit force
+                    Vector3 direction = m_Target.position - m_SpitSpawn.position;
+                    bulletRb.AddForce(direction.normalized * bulletSpeed, ForceMode.Impulse);
 
-                //Eliminate stored object from the stack and store the values
-                EssencialProperties objToSpit;
+                    //Eliminate stored object from the stack and store the values
+                    EssencialProperties objToSpit;
 
-                objToSpit = eatenGameObjects.Peek();
-                eatenGameObjects.Pop();
-                GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
-                SumSize(-objToSpit.largeSize);
-                MinScalarSize(-objToSpit.largeSize);
-                SumWeight(-objToSpit.weight);
-                SetNewMass(m_EssencialProperties.weight);
+                    objToSpit = eatenGameObjects.Peek();
+                    eatenGameObjects.Pop();
+                    GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
+                    SumSize(-objToSpit.largeSize);
+                    MinScalarSize(-objToSpit.largeSize);
+                    SumWeight(-objToSpit.weight);
+                    SetNewMass(m_EssencialProperties.weight);
+                }
             }
 
             spitInputButton = false;
@@ -348,36 +351,39 @@ public class Hungerin : MonoBehaviour
     {
         if (spitInputButton)
         {
-            if (transform.localScale.x > minSize && eatenGameObjects.Count > 0)
+            if (!isGrappeling)
             {
-                // Spit
-                GameObject bullet = Instantiate(bulletFirePrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
-                Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+                if (transform.localScale.x > minSize && eatenGameObjects.Count > 0)
+                {
+                    // Spit
+                    GameObject bullet = Instantiate(bulletFirePrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
+                    Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
 
-                // Spit force
-                Vector3 direction = m_Target.position - m_SpitSpawn.position;
-                bulletRb.AddForce(direction.normalized * bulletFireSpeed, ForceMode.Impulse);
+                    // Spit force
+                    Vector3 direction = m_Target.position - m_SpitSpawn.position;
+                    bulletRb.AddForce(direction.normalized * bulletFireSpeed, ForceMode.Impulse);
 
-                //Eliminate stored object from the stack and store the values
-                EssencialProperties objToSpit;
+                    //Eliminate stored object from the stack and store the values
+                    EssencialProperties objToSpit;
 
-                objToSpit = eatenGameObjects.Peek();
-                eatenGameObjects.Pop();
-                //GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
-                SumSize(-objToSpit.largeSize);
-                MinScalarSize(-objToSpit.largeSize);
-                SumWeight(-objToSpit.weight);
-                SetNewMass(m_EssencialProperties.weight);
-            }
-            else
-            {
-                // Spit
-                GameObject bullet = Instantiate(bulletFirePrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
-                Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+                    objToSpit = eatenGameObjects.Peek();
+                    eatenGameObjects.Pop();
+                    //GameObject.Find("GameController").GetComponent<GameController>().ReSpawnObj();
+                    SumSize(-objToSpit.largeSize);
+                    MinScalarSize(-objToSpit.largeSize);
+                    SumWeight(-objToSpit.weight);
+                    SetNewMass(m_EssencialProperties.weight);
+                }
+                else
+                {
+                    // Spit
+                    GameObject bullet = Instantiate(bulletFirePrefab, m_SpitSpawn.position, m_SpitSpawn.rotation);
+                    Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
 
-                // Spit force
-                Vector3 direction = m_Target.position - m_SpitSpawn.position;
-                bulletRb.AddForce(direction.normalized * bulletSpeed, ForceMode.Impulse);
+                    // Spit force
+                    Vector3 direction = m_Target.position - m_SpitSpawn.position;
+                    bulletRb.AddForce(direction.normalized * bulletSpeed, ForceMode.Impulse);
+                }
             }
 
             spitInputButton = false;

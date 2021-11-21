@@ -23,26 +23,30 @@ public class ReSpawn : MonoBehaviour
                 case (Objects.ObjType.JEWEL):
                     assetPrefab = Resources.Load<GameObject>("Prefabs/jewel");
                     Instantiate(assetPrefab, tempPos, tempRot, GameObject.Find("Eateable_Objects").transform);
+                    Destroy(other.gameObject);
                     break;
                 case (Objects.ObjType.LOG):
                     assetPrefab = Resources.Load<GameObject>("Prefabs/Log");
                     assetPrefab.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
                     Instantiate(assetPrefab, tempPos, tempRot, GameObject.Find("Eateable_Objects").transform);
+                    Destroy(other.gameObject);
                     break;
                 case (Objects.ObjType.LOGSTACK):
                     assetPrefab = Resources.Load<GameObject>("Prefabs/Log_Stack");
                     assetPrefab.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
                     Instantiate(assetPrefab, tempPos, tempRot, GameObject.Find("Eateable_Objects").transform);
+                    Destroy(other.gameObject);
                     break;
                 case (Objects.ObjType.CRATE):
-                    assetPrefab = Resources.Load<GameObject>("Prefabs/Crate");
-                    Instantiate(assetPrefab, tempPos, tempRot, GameObject.Find("NotEateable").transform);
+                    //assetPrefab = Resources.Load<GameObject>("Prefabs/Crate");
+                    other.gameObject.transform.position = tempPos;
+                    other.gameObject.transform.rotation = tempRot;
+                    //Instantiate(assetPrefab, tempPos, tempRot, GameObject.Find("NotEateable").transform);
                     break;
                 default:
                     Debug.Log("Couldn't find gameObject to Respawn");
                     break;
             }
-            Destroy(other.gameObject);
         }
     }
 
